@@ -1,61 +1,63 @@
-import Cmd from "node-cmd";
 import Express from "express";
-import Multer from "multer";
+import Path from "path";
+import { exec } from "child_process";
 
 // Source
 import * as ControllerHelper from "../Controller/Helper";
-import * as ModelError from "../Model/Error";
+import * as ControllerUpload from "../Controller/Upload";
 
-export const execute = (app: Express.Express, parser: Express.RequestHandler, multer: Multer.Multer): void => {
-    app.post("/msantivirus/update", parser, async (req: Express.Request, res: Express.Response) => {
-        ControllerHelper.writeLog("Antivirus.ts =>", "/msantivirus/update");
+export const execute = (app: Express.Express): void => {
+    app.post("/msantivirus/check", (request: Express.Request, response: Express.Response) => {
+        void (async () => {
+            await ControllerUpload.execute(request)
+                .then((result) => {
+                    const input = result.input;
 
-        ControllerHelper.checkRequest(req);
+                    exec(`clamdscan "${input}"`, (error, stdout, stderr) => {
+                        void (async () => {
+                            ControllerHelper.fileRemove(input);
 
-        if (req.body.checkRequest && req.body.checkRequest.tokenWrong === "") {
-            Cmd.run("freshclam --quiet", async (cmdError: ModelError.Cmd) => {
-                if (cmdError) {
-                    ControllerHelper.writeLog("Upload.ts => /msantivirus/update", `Cmd.run(freshclam ... - cmdError: ${cmdError}`);
+                            if (stdout !== "" && stderr === "") {
+                                ControllerHelper.writeLog("Antivirus.ts - exec('clamdscan... - stdout", stdout);
 
-                    res.status(500).send({ Error: "Update fail!" });
-                } else {
-                    res.status(200).send({ Response: "ok" });
-                }
-            });
-        } else if (req.body.checkRequest && req.body.checkRequest.tokenWrong !== "") {
-            res.status(500).send({ Error: `Token wrong: ${req.body.checkRequest.tokenWrong}` });
-        } else {
-            res.status(500).send({ Error: "System error." });
-        }
+                                response.status(200).send({ Response: stdout });
+                            } else if (stdout === "" && stderr !== "") {
+                                ControllerHelper.writeLog("Antivirus.ts - exec('clamdscan... - stderr", stderr);
+
+                                response.status(500).send({ Error: stderr });
+                            }
+                        })();
+                    });
+                })
+                .catch(() => {
+                    response.status(500).send({ Error: "Upload failed." });
+                });
+        })();
     });
 
-    app.post("/msantivirus/check", multer.single("file"), async (req: Express.Request, res: Express.Response) => {
-        ControllerHelper.writeLog("Upload.ts => /msantivirus/check", `req.body: ${ControllerHelper.objectOutput(req.body)} / req.file: ${ControllerHelper.objectOutput(req.file)}`);
+    app.post("/msantivirus/update", (request: Express.Request, response: Express.Response) => {
+        void (async () => {
+            const check = ControllerHelper.checkToken(request.body.token_api);
 
-        if (req.file && req.body.checkRequest && req.body.checkRequest.tokenWrong === "" && req.body.checkRequest.parameterNotFound === "" && req.body.checkRequest.mimeTypeWrong === "") {
-            const input = `./${req.file.path}`;
+            if (check) {
+                exec("freshclam", (error, stdout, stderr) => {
+                    void (async () => {
+                        if (stdout !== "" && stderr === "") {
+                            ControllerHelper.writeLog("Antivirus.ts - exec('freshclam --quiet... - stdout", stdout);
 
-            Cmd.run(`clamdscan ${input}`, async (cmdError: ModelError.Cmd) => {
-                if (cmdError) {
-                    ControllerHelper.writeLog("Upload.ts => /msantivirus/check", `clamdscan -r ... - cmdError: ${cmdError}`);
+                            response.status(200).send({ Response: stdout });
+                        } else if (stdout === "" && stderr !== "") {
+                            ControllerHelper.writeLog("Antivirus.ts - exec('freshclam --quiet... - stderr", stderr);
 
-                    ControllerHelper.fileRemove(input);
+                            response.status(500).send({ Error: stderr });
+                        }
+                    })();
+                });
+            } else {
+                ControllerHelper.writeLog("Antivirus.ts - app.post('/msantivirus/update' - error token_api", request.body.token_api);
 
-                    res.status(500).send({ Error: `File: ${input} NOT safe!` });
-                } else {
-                    ControllerHelper.fileRemove(input);
-
-                    res.status(200).send({ Response: "ok" });
-                }
-            });
-        } else if (req.body.checkRequest && req.body.checkRequest.tokenWrong !== "") {
-            res.status(500).send({ Error: `Token wrong: ${req.body.checkRequest.tokenWrong}` });
-        } else if (req.body.checkRequest && req.body.checkRequest.parameterNotFound !== "") {
-            res.status(500).send({ Error: `Parameter not found: ${req.body.checkRequest.parameterNotFound}` });
-        } else if (req.body.checkRequest && req.body.checkRequest.mimeTypeWrong !== "") {
-            res.status(500).send({ Error: `Mime type worng: ${req.body.checkRequest.mimeTypeWrong}` });
-        } else {
-            res.status(500).send({ Error: "File not found." });
-        }
+                response.status(500).send({ Error: "token_api not valid!" });
+            }
+        })();
     });
 };

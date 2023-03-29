@@ -1,15 +1,14 @@
 import Fs from "fs";
-import Express from "express";
 
 // Source
 import * as ModelHelper from "../Model/Helper";
 
-export const checkEnv = (key: string, value: string | undefined): string | undefined => {
+export const checkEnv = (key: string, value: string | undefined): string => {
     if (value === undefined) {
-        console.log("Helper.ts => checkEnv", `error: ${key} is not defined!`);
+        writeLog("Helper.ts - checkEnv - error:", `${key} is not defined!`);
     }
 
-    return value;
+    return value as string;
 };
 
 export const ENV_NAME = checkEnv("ENV_NAME", process.env.ENV_NAME);
@@ -20,20 +19,11 @@ export const SERVER_PORT = checkEnv("MS_A_SERVER_PORT", process.env.MS_A_SERVER_
 export const MIME_TYPE = checkEnv("MS_A_MIME_TYPE", process.env.MS_A_MIME_TYPE);
 export const FILE_SIZE = checkEnv("MS_A_FILE_SIZE", process.env.MS_A_FILE_SIZE);
 export const TOKEN = checkEnv("MS_A_TOKEN", process.env.MS_A_TOKEN);
-
-export const PATH_STATIC = "./static/";
-export const PATH_LOG = "./log/";
-export const PATH_FILE_INPUT = "./file/input/";
-export const PATH_CERTIFICATE_FILE_KEY = "/home/root/certificate/tls.key";
-export const PATH_CERTIFICATE_FILE_CRT = "/home/root/certificate/tls.crt";
-
-export const writeLog = <T>(tag: string, value: T): void => {
-    if (DEBUG === "true") {
-        Fs.appendFile(`${PATH_LOG}debug.log`, `${tag}: ${value}\n`, () => {
-            console.log(`WriteLog => ${tag}: `, value);
-        });
-    }
-};
+export const PATH_STATIC = checkEnv("MS_A_PATH_STATIC", process.env.MS_A_PATH_STATIC);
+export const PATH_LOG = checkEnv("MS_A_PATH_LOG", process.env.MS_A_PATH_LOG);
+export const PATH_FILE_INPUT = checkEnv("MS_A_PATH_FILE_INPUT", process.env.MS_A_PATH_FILE_INPUT);
+export const PATH_CERTIFICATE_FILE_KEY = checkEnv("MS_A_PATH_CERTIFICATE_FILE_KEY", process.env.MS_A_PATH_CERTIFICATE_FILE_KEY);
+export const PATH_CERTIFICATE_FILE_CRT = checkEnv("MS_A_PATH_CERTIFICATE_FILE_CRT", process.env.MS_A_PATH_CERTIFICATE_FILE_CRT);
 
 const circularReplacer = (): ModelHelper.circularReplacer => {
     const seen = new WeakSet();
@@ -55,6 +45,14 @@ export const objectOutput = (obj: unknown): string => {
     return JSON.stringify(obj, circularReplacer(), 2);
 };
 
+export const writeLog = (tag: string, value: string): void => {
+    if (DEBUG === "true" && PATH_LOG) {
+        Fs.appendFile(`${PATH_LOG}debug.log`, `${tag}: ${value}\n`, () => {
+            console.log(`WriteLog => ${tag}: `, value);
+        });
+    }
+};
+
 export const serverTime = (): string => {
     const currentDate = new Date();
 
@@ -74,10 +72,33 @@ export const serverTime = (): string => {
 
     const time = `${currentDate.getHours()}:${minuteOut}:${secondOut}`;
 
-    return `${date} ${time}`;
+    const result = `${date} ${time}`;
+
+    writeLog("Helper.ts => serverTime", result);
+
+    return result;
 };
 
-export const fileReadStream = async (filePath: string): Promise<Buffer> => {
+export const fileWriteStream = (filePath: string, buffer: Buffer): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const writeStream = Fs.createWriteStream(filePath);
+
+        writeStream.on("open", () => {
+            writeStream.write(buffer);
+            writeStream.end();
+        });
+
+        writeStream.on("finish", () => {
+            resolve();
+        });
+
+        writeStream.on("error", (error: Error) => {
+            reject(error);
+        });
+    });
+};
+
+export const fileReadStream = (filePath: string): Promise<Buffer> => {
     return new Promise((resolve, reject) => {
         const chunkList: Buffer[] = [];
 
@@ -88,69 +109,31 @@ export const fileReadStream = async (filePath: string): Promise<Buffer> => {
         });
 
         readStream.on("end", () => {
-            const buffer = Buffer.concat(chunkList);
+            const result = Buffer.concat(chunkList);
 
-            resolve(buffer);
+            resolve(result);
         });
 
-        readStream.on("error", reject);
+        readStream.on("error", (error: Error) => {
+            reject(error);
+        });
     });
 };
 
 export const fileRemove = (path: string): void => {
+    writeLog("Helper.ts => fileRemove", `path: ${path}`);
+
     Fs.unlink(path, (error: NodeJS.ErrnoException | null) => {
         if (error) {
-            writeLog("Helper.ts => fileRemove", `unlink - error: ${error}`);
+            writeLog("Helper.ts => fileRemove", `Fs.unlink - error: ${objectOutput(error)}`);
         }
     });
 };
 
-export const checkRequest = async (req: Express.Request, file?: globalThis.Express.Multer.File): Promise<boolean> => {
-    let result = false;
-
-    // Token
-    let tokenWrong = "";
-
-    const token = req.body.token_api && TOKEN && req.body.token_api === TOKEN ? true : false;
-
-    if (!token) {
-        tokenWrong = "token_api";
+export const checkToken = (value: string): boolean => {
+    if (TOKEN && TOKEN === value) {
+        return true;
     }
 
-    // Parameter
-    let parameterNotFound = "";
-
-    if (file) {
-        if (!req.body.file_name) {
-            parameterNotFound = "file_name";
-        } else if (!file) {
-            parameterNotFound = "file";
-        }
-    }
-
-    // Mime type
-    let mimeTypeWrong = "";
-
-    if (file) {
-        const mimeTypeInclude = MIME_TYPE ? MIME_TYPE.includes(file.mimetype) : false;
-
-        if (!mimeTypeInclude) {
-            mimeTypeWrong = file.mimetype;
-        }
-    }
-
-    // Populate request body
-    req.body.checkRequest = {};
-    req.body.checkRequest["tokenWrong"] = tokenWrong;
-    req.body.checkRequest["parameterNotFound"] = parameterNotFound;
-    req.body.checkRequest["mimeTypeWrong"] = mimeTypeWrong;
-
-    // Result
-    if (tokenWrong === "" && parameterNotFound === "" && mimeTypeWrong === "") {
-        result = true;
-    }
-
-    writeLog("Helper.ts => checkRequest", `result: ${result}`);
-
-    return result;
+    return false;
 };
