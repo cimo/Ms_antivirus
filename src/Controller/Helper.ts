@@ -22,7 +22,6 @@ export const TOKEN = checkEnv("MS_A_TOKEN", process.env.MS_A_TOKEN);
 export const PATH_STATIC = checkEnv("MS_A_PATH_STATIC", process.env.MS_A_PATH_STATIC);
 export const PATH_LOG = checkEnv("MS_A_PATH_LOG", process.env.MS_A_PATH_LOG);
 export const PATH_FILE_INPUT = checkEnv("MS_A_PATH_FILE_INPUT", process.env.MS_A_PATH_FILE_INPUT);
-export const PATH_FILE_OUTPUT = checkEnv("MS_A_PATH_FILE_OUTPUT", process.env.MS_A_PATH_FILE_OUTPUT);
 export const PATH_CERTIFICATE_FILE_KEY = checkEnv("MS_A_PATH_CERTIFICATE_FILE_KEY", process.env.MS_A_PATH_CERTIFICATE_FILE_KEY);
 export const PATH_CERTIFICATE_FILE_CRT = checkEnv("MS_A_PATH_CERTIFICATE_FILE_CRT", process.env.MS_A_PATH_CERTIFICATE_FILE_CRT);
 

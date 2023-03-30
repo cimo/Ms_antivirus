@@ -69,11 +69,10 @@ export const execute = (request: Express.Request): Promise<Record<string, string
                     for (const value of formDataList) {
                         if (value.name === "file" && value.filename && value.buffer) {
                             const input = `${ControllerHelper.PATH_FILE_INPUT}${value.filename}`;
-                            const output = `${ControllerHelper.PATH_FILE_OUTPUT}${value.filename.split(".")[0]}.pdf`;
 
                             await ControllerHelper.fileWriteStream(input, value.buffer)
                                 .then(() => {
-                                    resolve({ input, output });
+                                    resolve({ input });
                                 })
                                 .catch((error: Error) => {
                                     ControllerHelper.writeLog("Upload.ts - ControllerHelper.fileWriteStream - catch error", ControllerHelper.objectOutput(error));
