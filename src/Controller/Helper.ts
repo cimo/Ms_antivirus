@@ -5,7 +5,7 @@ import * as ModelHelper from "../Model/Helper";
 
 export const checkEnv = (key: string, value: string | undefined): string => {
     if (value === undefined) {
-        writeLog("Helper.ts - checkEnv - error:", `${key} is not defined!`);
+        console.log("Helper.ts - checkEnv - error:", `${key} is not defined!`);
     }
 
     return value as string;
@@ -22,6 +22,7 @@ export const TOKEN = checkEnv("MS_A_TOKEN", process.env.MS_A_TOKEN);
 export const PATH_STATIC = checkEnv("MS_A_PATH_STATIC", process.env.MS_A_PATH_STATIC);
 export const PATH_LOG = checkEnv("MS_A_PATH_LOG", process.env.MS_A_PATH_LOG);
 export const PATH_FILE_INPUT = checkEnv("MS_A_PATH_FILE_INPUT", process.env.MS_A_PATH_FILE_INPUT);
+export const PATH_FILE_OUTPUT = checkEnv("MS_A_PATH_FILE_OUTPUT", process.env.MS_A_PATH_FILE_OUTPUT);
 export const PATH_CERTIFICATE_FILE_KEY = checkEnv("MS_A_PATH_CERTIFICATE_FILE_KEY", process.env.MS_A_PATH_CERTIFICATE_FILE_KEY);
 export const PATH_CERTIFICATE_FILE_CRT = checkEnv("MS_A_PATH_CERTIFICATE_FILE_CRT", process.env.MS_A_PATH_CERTIFICATE_FILE_CRT);
 
@@ -74,8 +75,6 @@ export const serverTime = (): string => {
 
     const result = `${date} ${time}`;
 
-    writeLog("Helper.ts => serverTime", result);
-
     return result;
 };
 
@@ -120,13 +119,15 @@ export const fileReadStream = (filePath: string): Promise<Buffer> => {
     });
 };
 
-export const fileRemove = (path: string): void => {
-    writeLog("Helper.ts => fileRemove", `path: ${path}`);
-
-    Fs.unlink(path, (error: NodeJS.ErrnoException | null) => {
-        if (error) {
-            writeLog("Helper.ts => fileRemove", `Fs.unlink - error: ${objectOutput(error)}`);
-        }
+export const fileRemove = (path: string): Promise<NodeJS.ErrnoException | boolean> => {
+    return new Promise((resolve, reject) => {
+        Fs.unlink(path, (error: NodeJS.ErrnoException | null) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(true);
+            }
+        });
     });
 };
 
