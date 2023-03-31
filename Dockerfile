@@ -46,4 +46,4 @@ CMD service clamav-daemon restart \
     && service clamav-daemon status \
     && node /home/root/dist/Controller/Server.js
 
-EXPOSE 1990
+EXPOSE 1001

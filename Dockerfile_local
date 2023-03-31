@@ -40,4 +40,4 @@ CMD service clamav-daemon restart \
     && service clamav-daemon status \
     && npm install && npm run execute
 
-EXPOSE 1990
+EXPOSE 1001 30001
