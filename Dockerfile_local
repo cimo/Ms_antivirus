@@ -2,9 +2,11 @@ FROM node:18.13.0
 
 ARG ENV_NAME
 ARG DOMAIN
+ARG MS_A_SERVER_PORT
 
 ENV ENV_NAME=${ENV_NAME}
 ENV DOMAIN=${DOMAIN}
+ENV MS_A_SERVER_PORT=${MS_A_SERVER_PORT}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -40,4 +42,4 @@ CMD service clamav-daemon restart \
     && service clamav-daemon status \
     && npm install && npm run execute
 
-EXPOSE 1001 30001
+EXPOSE ${MS_A_SERVER_PORT}
