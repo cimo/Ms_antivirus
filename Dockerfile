@@ -3,12 +3,12 @@ FROM node:18.13.0
 ARG VERSION_TAG
 ARG ENV_NAME
 ARG DOMAIN
-ARG MS_A_SERVER_PORT
+
+ARG SERVER_PORT
 
 ENV VERSION_TAG=${VERSION_TAG}
 ENV ENV_NAME=${ENV_NAME}
 ENV DOMAIN=${DOMAIN}
-ENV MS_A_SERVER_PORT=${MS_A_SERVER_PORT}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -26,7 +26,10 @@ RUN cd ~ \
     && chmod 775 /home/root/ /usr/local/lib/node_modules/ \
     # Apt
     && apt-get update && apt-get install -y \
+    ca-certificates \
     clamav-daemon \
+    # Certificate
+    && update-ca-certificates \
     # ClamAV
     && mkdir /var/run/clamav/ \
     && chown clamav:clamav /var/run/clamav/ /var/lib/clamav/ /run/clamav/ /etc/clamav/ \
@@ -48,4 +51,4 @@ CMD service clamav-daemon restart \
     && service clamav-daemon status \
     && node /home/root/dist/Controller/Server.js
 
-EXPOSE ${MS_A_SERVER_PORT}
+EXPOSE ${SERVER_PORT}
