@@ -26,7 +26,7 @@ export const PATH_FILE_INPUT = checkEnv("MS_A_PATH_FILE_INPUT", process.env.MS_A
 export const PATH_CERTIFICATE_FILE_KEY = checkEnv("MS_A_PATH_CERTIFICATE_FILE_KEY", process.env.MS_A_PATH_CERTIFICATE_FILE_KEY);
 export const PATH_CERTIFICATE_FILE_CRT = checkEnv("MS_A_PATH_CERTIFICATE_FILE_CRT", process.env.MS_A_PATH_CERTIFICATE_FILE_CRT);
 
-const circularReplacer = (): ModelHelper.circularReplacer => {
+const circularReplacer = (): ModelHelper.IcircularReplacer => {
     const seen = new WeakSet();
 
     return (key: string, value: string): string | null => {

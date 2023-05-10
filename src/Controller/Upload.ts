@@ -3,6 +3,7 @@ import * as FormDataParser from "@cimo/form-data_parser";
 
 // Source
 import * as ControllerHelper from "../Controller/Helper";
+import * as ModelHelper from "../Model/Helper";
 
 const checkRequest = (formDataList: FormDataParser.Iinput[]): boolean => {
     const parameterList: string[] = [];
@@ -53,7 +54,7 @@ const checkRequest = (formDataList: FormDataParser.Iinput[]): boolean => {
     return result;
 };
 
-export const execute = (request: Express.Request): Promise<Record<string, string>> => {
+export const execute = (request: Express.Request): Promise<ModelHelper.IresponseExecute> => {
     return new Promise((resolve, reject) => {
         const chunkList: Buffer[] = [];
 
@@ -75,11 +76,11 @@ export const execute = (request: Express.Request): Promise<Record<string, string
 
                             await ControllerHelper.fileWriteStream(input, value.buffer)
                                 .then(() => {
-                                    resolve({ input });
+                                    resolve({ response: { stdout: input, stderr: "" } });
                                 })
                                 .catch((error: Error) => {
                                     ControllerHelper.writeLog(
-                                        "Upload.ts - ControllerHelper.fileWriteStream - catch error",
+                                        "Upload.ts - ControllerHelper.fileWriteStream() - catch: ",
                                         ControllerHelper.objectOutput(error)
                                     );
                                 });
@@ -94,6 +95,8 @@ export const execute = (request: Express.Request): Promise<Record<string, string
         });
 
         request.on("error", (error: Error) => {
+            ControllerHelper.writeLog("Upload.ts - execute() - error: ", ControllerHelper.objectOutput(error));
+
             reject(error);
         });
     });
