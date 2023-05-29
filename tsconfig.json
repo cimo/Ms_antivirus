@@ -15,7 +15,5 @@
         "baseUrl": "./",
         "outDir": "./dist/",
         "lib": ["ES2016", "DOM", "DOM.Iterable"]
-    },
-    "include": ["src/**/*.ts", "**/*.js"],
-    "exclude": ["dist", "node_modules", "public"]
+    }
 }

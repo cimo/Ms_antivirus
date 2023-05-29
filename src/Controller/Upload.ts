@@ -3,12 +3,11 @@ import * as FormDataParser from "@cimo/form-data_parser";
 
 // Source
 import * as ControllerHelper from "../Controller/Helper";
-import * as ModelHelper from "../Model/Helper";
 
 const checkRequest = (formDataList: FormDataParser.Iinput[]): boolean => {
     const parameterList: string[] = [];
     let tokenWrong = false;
-    let fileWrong = "";
+    let fileProblem = "";
     let parameterNotFound = "";
 
     for (const value of formDataList) {
@@ -20,11 +19,11 @@ const checkRequest = (formDataList: FormDataParser.Iinput[]): boolean => {
 
         if (value.name === "file") {
             if (value.filename === "" || value.mimeType === "" || value.size === "") {
-                fileWrong = "empty";
+                fileProblem = "empty";
             } else if (!ControllerHelper.checkMymeType(value.mimeType)) {
-                fileWrong = "mimeType";
+                fileProblem = "mimeType";
             } else if (!ControllerHelper.checkFileSize(value.size)) {
-                fileWrong = "size";
+                fileProblem = "size";
             }
         }
 
@@ -45,16 +44,16 @@ const checkRequest = (formDataList: FormDataParser.Iinput[]): boolean => {
 
     ControllerHelper.writeLog(
         "Upload.ts - checkRequest",
-        `tokenWrong: ${tokenWrong.toString()} - fileWrong: ${fileWrong.toString()} - parameterNotFound: ${parameterNotFound}`
+        `tokenWrong: ${tokenWrong.toString()} - fileProblem: ${fileProblem.toString()} - parameterNotFound: ${parameterNotFound}`
     );
 
     // Result
-    const result = tokenWrong === false && fileWrong === "" && parameterNotFound === "" ? true : false;
+    const result = tokenWrong === false && fileProblem === "" && parameterNotFound === "" ? true : false;
 
     return result;
 };
 
-export const execute = (request: Express.Request): Promise<ModelHelper.IresponseExecute> => {
+export const execute = (request: Express.Request): Promise<string> => {
     return new Promise((resolve, reject) => {
         const chunkList: Buffer[] = [];
 
@@ -76,11 +75,11 @@ export const execute = (request: Express.Request): Promise<ModelHelper.Iresponse
 
                             await ControllerHelper.fileWriteStream(input, value.buffer)
                                 .then(() => {
-                                    resolve({ response: { stdout: input, stderr: "" } });
+                                    resolve(input);
                                 })
                                 .catch((error: Error) => {
                                     ControllerHelper.writeLog(
-                                        "Upload.ts - ControllerHelper.fileWriteStream() - catch: ",
+                                        "Upload.ts - ControllerHelper.fileWriteStream() - catch error: ",
                                         ControllerHelper.objectOutput(error)
                                     );
                                 });
@@ -89,7 +88,7 @@ export const execute = (request: Express.Request): Promise<ModelHelper.Iresponse
                         }
                     }
                 } else {
-                    reject();
+                    reject(check);
                 }
             })();
         });

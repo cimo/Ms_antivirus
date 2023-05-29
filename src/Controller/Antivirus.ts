@@ -11,38 +11,33 @@ export const execute = (app: Express.Express) => {
         void (async () => {
             await ControllerUpload.execute(request)
                 .then((result) => {
-                    const input = result.response.stdout;
-
-                    exec(`clamdscan "${input}"`, (error, stdout, stderr) => {
+                    exec(`clamdscan "${result}"`, (error, stdout, stderr) => {
                         void (async () => {
-                            await ControllerHelper.fileRemove(input)
+                            await ControllerHelper.fileRemove(result)
                                 .then()
                                 .catch((error: Error) => {
                                     ControllerHelper.writeLog(
-                                        "Antivirus.ts - ControllerHelper.fileRemove() - input error: ",
+                                        "Antivirus.ts - ControllerHelper.fileRemove() - catch error: ",
                                         ControllerHelper.objectOutput(error)
                                     );
                                 });
 
                             if (stdout !== "" && stderr === "") {
-                                response.status(200).send({ response: { stdout, stderr } });
+                                ControllerHelper.responseBody(stdout, "", response, 200);
                             } else if (stdout === "" && stderr !== "") {
-                                ControllerHelper.writeLog("Antivirus.ts - exec(`clamdscan ... - stderr: ", result.response.stderr);
+                                ControllerHelper.writeLog("Antivirus.ts - exec(`clamdscan ... - stderr: ", stderr);
 
-                                response.status(500).send({ response: { stdout, stderr } });
+                                ControllerHelper.responseBody("", stderr, response, 500);
                             } else {
-                                response.status(200).send({ response: { stdout, stderr } });
+                                ControllerHelper.responseBody(stdout, "", response, 200);
                             }
                         })();
                     });
                 })
-                .catch((result: ModelHelper.IresponseExecute) => {
-                    ControllerHelper.writeLog("Antivirus.ts - /msantivirus/check - stderr: ", result.response.stderr);
+                .catch((error: Error) => {
+                    ControllerHelper.writeLog("Antivirus.ts - /msantivirus/check - catch error: ", ControllerHelper.objectOutput(error));
 
-                    response.status(500).send({
-                        stdout: result.response.stdout,
-                        stderr: result.response.stderr
-                    });
+                    ControllerHelper.responseBody("", error, response, 500);
                 });
         })();
     });
@@ -55,22 +50,19 @@ export const execute = (app: Express.Express) => {
         if (checkToken) {
             exec("freshclam", (error, stdout, stderr) => {
                 if (stdout !== "" && stderr === "") {
-                    response.status(200).send({ response: { stdout, stderr } });
+                    ControllerHelper.responseBody(stdout, "", response, 200);
                 } else if (stdout === "" && stderr !== "") {
                     ControllerHelper.writeLog("Antivirus.ts - exec(`freshclam ... - stderr: ", stderr);
 
-                    response.status(500).send({ response: { stdout, stderr } });
+                    ControllerHelper.responseBody("", stderr, response, 500);
                 } else {
-                    response.status(200).send({ response: { stdout, stderr } });
+                    ControllerHelper.responseBody(stdout, "", response, 200);
                 }
             });
         } else {
             ControllerHelper.writeLog("Antivirus.ts - /msantivirus/update - tokenWrong: ", requestBody.token_api);
 
-            response.status(500).send({
-                stdout: "",
-                stderr: `tokenWrong: ${requestBody.token_api}`
-            });
+            ControllerHelper.responseBody("", `tokenWrong: ${requestBody.token_api}`, response, 500);
         }
     });
 };

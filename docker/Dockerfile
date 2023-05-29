@@ -1,29 +1,33 @@
-FROM node:18.13.0
+FROM ubuntu:20.04
 
-ARG VERSION_TAG
-ARG ENV_NAME
-ARG DOMAIN
+ARG _ENV_NAME
+ARG _DOMAIN
+ARG _TIMEZONE
+ARG _SERVER_PORT
+ARG _VERSION_TAG
 
-ARG SERVER_PORT
-
-ENV VERSION_TAG=${VERSION_TAG}
-ENV ENV_NAME=${ENV_NAME}
-ENV DOMAIN=${DOMAIN}
+ENV ENV_NAME=${_ENV_NAME}
+ENV DOMAIN=${_DOMAIN}
+ENV TZ=${_TIMEZONE}
+ENV VERSION_TAG=${_VERSION_TAG}
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
-ENV TZ="Asia/Tokyo"
+ENV SUDO_FORCE_REMOVE=yes
 
+COPY ./docker/nodejs_18_setup.sh /home/nodejs_18_setup.sh
 COPY ./ /home/root/
 
 RUN cd ~ \
+    # NodeJs
+    && bash /home/nodejs_18_setup.sh \
+    && apt-get update && apt-get install -y nodejs \
     # No root
-    && userdel node \
     && groupadd -g 1000 clamav \
     && useradd -d /home/root/ -s /bin/bash -u 1000 -g 1000 clamav \
-    && mkdir -p /home/root/ \
-    && chown -R clamav:clamav /home/root/ /usr/local/lib/node_modules/ \
-    && chmod 775 /home/root/ /usr/local/lib/node_modules/ \
+    && mkdir -p /home/root/ /usr/local/lib/node_modules/ \
+    && chown -R clamav:clamav /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
+    && chmod 775 /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
     # Apt
     && apt-get update && apt-get install -y \
     ca-certificates \
@@ -51,4 +55,4 @@ CMD service clamav-daemon restart \
     && service clamav-daemon status \
     && node /home/root/dist/Controller/Server.js
 
-EXPOSE ${SERVER_PORT}
+EXPOSE ${_SERVER_PORT}
