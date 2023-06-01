@@ -2,9 +2,9 @@ import Express from "express";
 import { exec } from "child_process";
 
 // Source
-import * as ControllerHelper from "../Controller/Helper";
-import * as ControllerUpload from "../Controller/Upload";
-import * as ModelHelper from "../Model/Helper";
+import * as ControllerHelper from "../controller/Helper";
+import * as ControllerUpload from "../controller/Upload";
+import * as ModelHelper from "../model/Helper";
 
 export const execute = (app: Express.Express) => {
     app.post("/msantivirus/check", (request: Express.Request, response: Express.Response) => {

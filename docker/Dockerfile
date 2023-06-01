@@ -54,6 +54,6 @@ RUN npm install && npm run build
 CMD service clamav-daemon restart \
     && service clamav-daemon status \
     # Node
-    && node /home/root/dist/Controller/Server.js
+    && node /home/root/dist/controller/Server.js
 
 EXPOSE ${_SERVER_PORT}
