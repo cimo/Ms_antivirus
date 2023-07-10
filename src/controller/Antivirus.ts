@@ -10,10 +10,20 @@ export const execute = (app: Express.Express) => {
     app.post("/msantivirus/check", (request: Express.Request, response: Express.Response) => {
         void (async () => {
             await ControllerUpload.execute(request)
-                .then((result) => {
-                    exec(`clamdscan "${result}"`, (error, stdout, stderr) => {
+                .then((resultList) => {
+                    let fileName = "";
+
+                    for (const value of resultList) {
+                        if (value.name === "file" && value.filename) {
+                            fileName = value.filename;
+                        }
+                    }
+
+                    const input = `${ControllerHelper.PATH_FILE_INPUT}${fileName}`;
+
+                    exec(`clamdscan "${input}"`, (error, stdout, stderr) => {
                         void (async () => {
-                            await ControllerHelper.fileRemove(result)
+                            await ControllerHelper.fileRemove(input)
                                 .then()
                                 .catch((error: Error) => {
                                     ControllerHelper.writeLog(
