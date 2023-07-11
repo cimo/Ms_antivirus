@@ -9,7 +9,7 @@ import * as ModelHelper from "../model/Helper";
 export const execute = (app: Express.Express) => {
     app.post("/msantivirus/check", (request: Express.Request, response: Express.Response) => {
         void (async () => {
-            await ControllerUpload.execute(request)
+            await ControllerUpload.execute(request, true)
                 .then((resultList) => {
                     let fileName = "";
 
