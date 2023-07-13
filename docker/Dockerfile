@@ -14,7 +14,6 @@ ENV VERSION_TAG=${_VERSION_TAG}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-COPY ./docker/nodejs_18_setup.sh /home/nodejs_18_setup.sh
 COPY ./ /home/root/
 
 RUN cd ~ \
@@ -30,6 +29,8 @@ RUN cd ~ \
     # Apt
     && apt-get update && apt-get install -y \
     ca-certificates \
+    fonts-noto \
+    fonts-noto-cjk \
     clamav-daemon \
     # Certificate
     && update-ca-certificates \
