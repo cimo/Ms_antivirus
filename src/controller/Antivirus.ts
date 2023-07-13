@@ -23,29 +23,38 @@ export const execute = (app: Express.Express) => {
 
                     exec(`clamdscan "${input}"`, (error, stdout, stderr) => {
                         void (async () => {
-                            await ControllerHelper.fileRemove(input)
-                                .then()
-                                .catch((error: Error) => {
-                                    ControllerHelper.writeLog(
-                                        "Antivirus.ts - ControllerHelper.fileRemove() - catch error: ",
-                                        ControllerHelper.objectOutput(error)
-                                    );
-                                });
+                            if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
+                                await ControllerHelper.fileRemove(input)
+                                    .then(() => {
+                                        ControllerHelper.responseBody(stdout, stderr, response, 200);
+                                    })
+                                    .catch((error: Error) => {
+                                        ControllerHelper.writeLog(
+                                            "Antivirus.ts - ControllerHelper.fileRemove(input) - catch error: ",
+                                            ControllerHelper.objectOutput(error)
+                                        );
 
-                            if (stdout !== "" && stderr === "") {
-                                ControllerHelper.responseBody(stdout, "", response, 200);
+                                        ControllerHelper.responseBody(stdout, stderr, response, 500);
+                                    });
                             } else if (stdout === "" && stderr !== "") {
                                 ControllerHelper.writeLog("Antivirus.ts - exec(`clamdscan ... - stderr: ", stderr);
 
+                                await ControllerHelper.fileRemove(input)
+                                    .then()
+                                    .catch((error: Error) => {
+                                        ControllerHelper.writeLog(
+                                            "Antivirus.ts - ControllerHelper.fileRemove(input) - catch error: ",
+                                            ControllerHelper.objectOutput(error)
+                                        );
+                                    });
+
                                 ControllerHelper.responseBody("", stderr, response, 500);
-                            } else {
-                                ControllerHelper.responseBody(stdout, "", response, 200);
                             }
                         })();
                     });
                 })
                 .catch((error: Error) => {
-                    ControllerHelper.writeLog("Antivirus.ts - /msantivirus/check - catch error: ", ControllerHelper.objectOutput(error));
+                    ControllerHelper.writeLog("Antivirus.ts - ControllerUpload.execute() - catch error: ", ControllerHelper.objectOutput(error));
 
                     ControllerHelper.responseBody("", error, response, 500);
                 });
@@ -59,14 +68,12 @@ export const execute = (app: Express.Express) => {
 
         if (checkToken) {
             exec("freshclam", (error, stdout, stderr) => {
-                if (stdout !== "" && stderr === "") {
-                    ControllerHelper.responseBody(stdout, "", response, 200);
+                if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
+                    ControllerHelper.responseBody(stdout, stderr, response, 200);
                 } else if (stdout === "" && stderr !== "") {
                     ControllerHelper.writeLog("Antivirus.ts - exec(`freshclam ... - stderr: ", stderr);
 
                     ControllerHelper.responseBody("", stderr, response, 500);
-                } else {
-                    ControllerHelper.responseBody(stdout, "", response, 200);
                 }
             });
         } else {

@@ -77,9 +77,7 @@ export const execute = (request: Express.Request, isExists: boolean): Promise<Fo
                             const input = `${ControllerHelper.PATH_FILE_INPUT}${value.filename}`;
 
                             if (isExists && Fs.existsSync(input)) {
-                                reject("File exists.");
-
-                                ControllerHelper.writeLog("Upload.ts - ControllerHelper.existsSync() - error: ", "File exists.");
+                                reject("Upload.ts - end - reject error: File exists.");
 
                                 break;
                             } else {
@@ -99,7 +97,7 @@ export const execute = (request: Express.Request, isExists: boolean): Promise<Fo
                         }
                     }
                 } else {
-                    reject(check);
+                    reject("Upload.ts - end - reject error: checkRequest()");
                 }
             })();
         });
