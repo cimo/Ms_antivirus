@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -19,6 +19,7 @@ COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
 COPY ./ /home/root/
 
 RUN cd ~ \
+    && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
     && apt-get update && apt-get install -y ca-certificates gnupg curl \
     && update-ca-certificates \
@@ -30,19 +31,14 @@ RUN cd ~ \
     # No root
     && groupadd -g 1000 clamav \
     && useradd -d /home/root/ -s /bin/bash -u 1000 -g 1000 clamav \
-    && mkdir -p /home/root/ /usr/local/lib/node_modules/ \
-    && chown -R clamav:clamav /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
-    && chmod 775 /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ \
+    && mkdir -p /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chown -R clamav:clamav /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chmod -R 775 /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     # Apt
     && apt-get update && apt-get install -y \
     fonts-noto \
     fonts-noto-cjk \
-    clamav-daemon \
-    # ClamAV
-    && mkdir /var/run/clamav/ \
-    && chown clamav:clamav /var/run/clamav/ /var/lib/clamav/ /run/clamav/ /etc/clamav/ \
-    && chmod 775 /var/run/clamav/ /var/lib/clamav/ /run/clamav/ /etc/clamav/ \
-    && freshclam \
+    clamav-daemon && freshclam \
     # Clean
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean -y \

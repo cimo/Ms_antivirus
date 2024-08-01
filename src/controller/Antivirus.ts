@@ -1,85 +1,88 @@
-import Express from "express";
-import { exec } from "child_process";
+import Express, { Request, Response } from "express";
+import { execFile } from "child_process";
+import { Ca } from "@cimo/authentication";
 
 // Source
-import * as ControllerHelper from "../controller/Helper";
-import * as ControllerUpload from "../controller/Upload";
-import * as ModelHelper from "../model/Helper";
+import * as HelperSrc from "../HelperSrc";
+import ControllerUpload from "./Upload";
 
-export const execute = (app: Express.Express) => {
-    app.post("/msantivirus/check", (request: Express.Request, response: Express.Response) => {
-        void (async () => {
-            await ControllerUpload.execute(request, true)
-                .then((resultList) => {
-                    let fileName = "";
+export default class ControllerAntivirus {
+    // Variable
+    private app: Express.Express;
+    private controllerUpload: ControllerUpload;
 
-                    for (const value of resultList) {
-                        if (value.name === "file" && value.filename) {
-                            fileName = value.filename;
-                        }
-                    }
+    // Method
+    constructor(app: Express.Express) {
+        this.app = app;
+        this.controllerUpload = new ControllerUpload();
+    }
 
-                    const input = `${ControllerHelper.PATH_FILE_INPUT}${fileName}`;
+    api = (): void => {
+        this.app.get("/api/update", Ca.authenticationMiddleware, (_, response: Response) => {
+            const execCommand = `. ${HelperSrc.PATH_FILE_SCRIPT}command1.sh`;
+            const execArgumentList = [];
 
-                    exec(`clamdscan "${input}"`, (error, stdout, stderr) => {
-                        void (async () => {
-                            if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
-                                await ControllerHelper.fileRemove(input)
-                                    .then(() => {
-                                        ControllerHelper.responseBody(stdout, stderr, response, 200);
-                                    })
-                                    .catch((error: Error) => {
-                                        ControllerHelper.writeLog(
-                                            "Antivirus.ts - ControllerHelper.fileRemove(input) - catch error: ",
-                                            ControllerHelper.objectOutput(error)
-                                        );
-
-                                        ControllerHelper.responseBody(stdout, stderr, response, 500);
-                                    });
-                            } else if (stdout === "" && stderr !== "") {
-                                ControllerHelper.writeLog("Antivirus.ts - exec(`clamdscan ... - stderr: ", stderr);
-
-                                await ControllerHelper.fileRemove(input)
-                                    .then()
-                                    .catch((error: Error) => {
-                                        ControllerHelper.writeLog(
-                                            "Antivirus.ts - ControllerHelper.fileRemove(input) - catch error: ",
-                                            ControllerHelper.objectOutput(error)
-                                        );
-                                    });
-
-                                ControllerHelper.responseBody("", stderr, response, 500);
-                            }
-                        })();
-                    });
-                })
-                .catch((error: Error) => {
-                    ControllerHelper.writeLog("Antivirus.ts - ControllerUpload.execute() - catch error: ", ControllerHelper.objectOutput(error));
-
-                    ControllerHelper.responseBody("", error, response, 500);
-                });
-        })();
-    });
-
-    app.post("/msantivirus/update", (request: Express.Request, response: Express.Response) => {
-        const requestBody = request.body as ModelHelper.IrequestBody;
-
-        const checkToken = ControllerHelper.checkToken(requestBody.token_api);
-
-        if (checkToken) {
-            exec("freshclam", (error, stdout, stderr) => {
+            execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
                 if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
-                    ControllerHelper.responseBody(stdout, stderr, response, 200);
+                    HelperSrc.responseBody(stdout, stderr, response, 200);
                 } else if (stdout === "" && stderr !== "") {
-                    ControllerHelper.writeLog("Antivirus.ts - exec(`freshclam ... - stderr: ", stderr);
+                    HelperSrc.writeLog("Antivirus.ts - api() => post(/api/update) => execFile(freshclam) => stderr", stderr);
 
-                    ControllerHelper.responseBody("", stderr, response, 500);
+                    HelperSrc.responseBody("", stderr, response, 500);
                 }
             });
-        } else {
-            ControllerHelper.writeLog("Antivirus.ts - /msantivirus/update - tokenWrong: ", requestBody.token_api);
+        });
 
-            ControllerHelper.responseBody("", `tokenWrong: ${requestBody.token_api}`, response, 500);
-        }
-    });
-};
+        this.app.post("/api/check", Ca.authenticationMiddleware, (request: Request, response: Response) => {
+            void (async () => {
+                await this.controllerUpload
+                    .execute(request, true)
+                    .then((resultControllerUploadList) => {
+                        let filename = "";
+
+                        for (const resultControllerUpload of resultControllerUploadList) {
+                            if (resultControllerUpload.name === "file" && resultControllerUpload.filename) {
+                                filename = resultControllerUpload.filename;
+
+                                break;
+                            }
+                        }
+
+                        const input = `${HelperSrc.PATH_FILE_INPUT}${filename}`;
+
+                        const execCommand = `. ${HelperSrc.PATH_FILE_SCRIPT}command2.sh`;
+                        const execArgumentList = [`"${input}"`];
+
+                        execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
+                            HelperSrc.fileRemove(input, (resultFileRemove) => {
+                                if (resultFileRemove) {
+                                    if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
+                                        HelperSrc.responseBody(stdout, stderr, response, 200);
+                                    } else if (stdout === "" && stderr !== "") {
+                                        HelperSrc.writeLog(
+                                            "Antivirus.ts - api() => post(/api/check) => execute() => execFile(clamdscan) => stderr",
+                                            stderr
+                                        );
+
+                                        HelperSrc.responseBody("", stderr, response, 500);
+                                    }
+                                } else {
+                                    HelperSrc.writeLog(
+                                        "Antivirus.ts - api() => post(/api/check) => execute() => execFile(clamdscan) => fileRemove()",
+                                        resultFileRemove.toString()
+                                    );
+
+                                    HelperSrc.responseBody("", resultFileRemove.toString(), response, 500);
+                                }
+                            });
+                        });
+                    })
+                    .catch((error: Error) => {
+                        HelperSrc.writeLog("Antivirus.ts - api() => post(/api/check) => execute() => catch()", error);
+
+                        HelperSrc.responseBody("", error, response, 500);
+                    });
+            })();
+        });
+    };
+}
