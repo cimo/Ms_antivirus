@@ -4,11 +4,13 @@ ARG _ENV_NAME
 ARG _DOMAIN
 ARG _TIMEZONE
 ARG _SERVER_PORT
+ARG _PATH_ROOT
 ARG _VERSION_TAG
 
 ENV ENV_NAME=${_ENV_NAME}
 ENV DOMAIN=${_DOMAIN}
 ENV TZ=${_TIMEZONE}
+ENV PATH_ROOT=${_PATH_ROOT}
 ENV VERSION_TAG=${_VERSION_TAG}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -16,7 +18,7 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV NODE_OPTIONS=--use-openssl-ca
 
 COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
-COPY ./ /home/root/
+COPY ./ ${PATH_ROOT}
 
 RUN cd ~ \
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
@@ -30,10 +32,10 @@ RUN cd ~ \
     && apt-get update && apt-get install -y nodejs \
     # No root
     && groupadd -g 1000 clamav \
-    && useradd -d /home/root/ -s /bin/bash -u 1000 -g 1000 clamav \
-    && mkdir -p /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chown -R clamav:clamav /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chmod -R 775 /home/root/ /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && useradd -d ${PATH_ROOT} -s /bin/bash -u 1000 -g 1000 clamav \
+    && mkdir -p ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chown -R clamav:clamav ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chmod -R 775 ${PATH_ROOT} /usr/local/lib/node_modules/ /usr/local/bin/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     # Apt
     && apt-get update && apt-get install -y \
     fonts-noto \
@@ -47,7 +49,7 @@ RUN cd ~ \
 
 USER clamav
 
-WORKDIR /home/root/
+WORKDIR ${PATH_ROOT}
 
 RUN npm install && npm run build
 
@@ -55,6 +57,6 @@ RUN npm install && npm run build
 CMD service clamav-daemon restart \
     && service clamav-daemon status \
     # Node
-    && node /home/root/dist/controller/Server.js
+    && node ${PATH_ROOT}dist/controller/Server.js
 
 EXPOSE ${_SERVER_PORT}
