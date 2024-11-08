@@ -30,6 +30,7 @@ export const ENV_NAME = checkEnv("ENV_NAME", process.env.ENV_NAME);
 export const DOMAIN = checkEnv("DOMAIN", process.env.DOMAIN);
 export const TIMEZONE = checkEnv("TIMEZONE", process.env.TIMEZONE);
 export const SERVER_PORT = checkEnv("SERVER_PORT", process.env.SERVER_PORT);
+export const PATH_ROOT = checkEnv("PATH_ROOT", process.env.PATH_ROOT);
 export const NAME = checkEnv("MS_A_NAME", process.env.MS_A_NAME);
 export const LABEL = checkEnv("MS_A_LABEL", process.env.MS_A_LABEL);
 export const DEBUG = checkEnv("MS_A_DEBUG", process.env.MS_A_DEBUG);
