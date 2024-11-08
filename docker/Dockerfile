@@ -61,4 +61,4 @@ CMD service clamav-daemon restart \
     # Node
     && node ${PATH_ROOT}dist/controller/Server.js
 
-EXPOSE ${_SERVER_PORT}
+EXPOSE ${SERVER_PORT}

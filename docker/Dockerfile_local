@@ -58,4 +58,4 @@ CMD cp -r ${PATH_ROOT}.ms_cronjob-volume/certificate/* ${PATH_ROOT}certificate/ 
     # Node
     && npm install && npm run execute
 
-EXPOSE ${_SERVER_PORT}
+EXPOSE ${SERVER_PORT}
