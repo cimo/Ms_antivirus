@@ -11,7 +11,7 @@ then
             value=$(echo "${line}" | cut -d "=" -f 2-)
             value=$(echo "${value}" | sed "s/^'\(.*\)'$/\1/")
 
-            if [ -z "$(echo ${!key})" ]
+            if [ -z "$(printenv ${key})" ]
             then
                 echo "File env export: ${key}=${value}"
 
