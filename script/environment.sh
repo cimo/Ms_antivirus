@@ -13,8 +13,6 @@ then
 
             if [ -z "$(printenv ${key})" ]
             then
-                echo "File env export: ${key}=${value}"
-
                 export "${key}=${value}"
             fi
         fi
