@@ -21,18 +21,18 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
-.cache/*
-.config/*
-.local/*
-.npm/*
-.pki/*
+.ms_cronjob-volume
+.npm
 certificate/*
 !certificate/**/
 certificate/proxy/*
 !certificate/proxy/.gitkeep
-dist/*
+dist
+file/input/*
+!file/input/.gitkeep
 log/*
 !log/.gitkeep
+node_modules
 public/file/*
 !public/file/.gitkeep
 public/js/*
@@ -40,8 +40,4 @@ public/js/*
 public/style/*
 !public/style/.gitkeep
 public/index.html
-node_modules
 package-lock.json
-# ---
-file/input/*
-!file/input/.gitkeep
