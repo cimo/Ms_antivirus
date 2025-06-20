@@ -56,7 +56,8 @@ USER clamav
 
 WORKDIR ${PATH_ROOT}
 
-RUN npm install \
+RUN rm -rf node_modules package-lock.json \
+    && npm install \
     && npm run build
 
 # ClamAV

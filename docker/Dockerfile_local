@@ -59,6 +59,7 @@ CMD cp -r ${PATH_ROOT}.ms_cronjob-volume/certificate/* ${PATH_ROOT}certificate/ 
     && service clamav-daemon restart \
     && service clamav-daemon status \
     # Npm
+    && rm -rf node_modules package-lock.json \
     && npm install \
     && npm run execute
 
