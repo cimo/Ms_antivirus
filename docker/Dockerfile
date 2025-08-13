@@ -64,6 +64,6 @@ RUN rm -rf node_modules package-lock.json \
 CMD service clamav-daemon restart \
     && service clamav-daemon status \
     # Node
-    && node ${PATH_ROOT}dist/controller/Server.js
+    && node ${PATH_ROOT}dist/src/controller/Server.js
 
 EXPOSE ${SERVER_PORT}
