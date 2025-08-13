@@ -1,6 +1,6 @@
 import Express, { Request, Response } from "express";
 import { execFile } from "child_process";
-import { Ca } from "@cimo/authentication";
+import { Ca } from "@cimo/authentication/dist/src/Main";
 
 // Source
 import * as HelperSrc from "../HelperSrc";
@@ -20,7 +20,7 @@ export default class ControllerAntivirus {
     api = (): void => {
         this.app.get("/api/update", Ca.authenticationMiddleware, (_, response: Response) => {
             const execCommand = `. ${HelperSrc.PATH_ROOT}${HelperSrc.PATH_FILE_SCRIPT}command1.sh`;
-            const execArgumentList = [];
+            const execArgumentList: string[] = [];
 
             execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
                 if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
