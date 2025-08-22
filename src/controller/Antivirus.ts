@@ -6,7 +6,7 @@ import { Ca } from "@cimo/authentication/dist/src/Main";
 import * as helperSrc from "../HelperSrc";
 import ControllerUpload from "./Upload";
 
-export default class ControllerAntivirus {
+export default class Antivirus {
     // Variable
     private app: Express.Express;
     private controllerUpload: ControllerUpload;
@@ -26,7 +26,7 @@ export default class ControllerAntivirus {
                 if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
                     helperSrc.responseBody(stdout, stderr, response, 200);
                 } else if (stdout === "" && stderr !== "") {
-                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile(freshclam) - stderr", stderr);
+                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stderr", stderr);
 
                     helperSrc.responseBody("", stderr, response, 500);
                 }
@@ -38,17 +38,17 @@ export default class ControllerAntivirus {
                 await this.controllerUpload
                     .execute(request, true)
                     .then((resultControllerUploadList) => {
-                        let filename = "";
+                        let fileName = "";
 
                         for (const resultControllerUpload of resultControllerUploadList) {
-                            if (resultControllerUpload.name === "file" && resultControllerUpload.filename) {
-                                filename = resultControllerUpload.filename;
+                            if (resultControllerUpload.name === "file" && resultControllerUpload.fileName) {
+                                fileName = resultControllerUpload.fileName;
 
                                 break;
                             }
                         }
 
-                        const input = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE_INPUT}${filename}`;
+                        const input = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE_INPUT}${fileName}`;
 
                         const execCommand = `. ${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE_SCRIPT}command2.sh`;
                         const execArgumentList = [`"${input}"`];
@@ -59,16 +59,13 @@ export default class ControllerAntivirus {
                                     if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
                                         helperSrc.responseBody(stdout, stderr, response, 200);
                                     } else if (stdout === "" && stderr !== "") {
-                                        helperSrc.writeLog(
-                                            "Antivirus.ts - api() - post(/api/check) - execute() - execFile(clamdscan) - stderr",
-                                            stderr
-                                        );
+                                        helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stderr", stderr);
 
                                         helperSrc.responseBody("", stderr, response, 500);
                                     }
                                 } else {
                                     helperSrc.writeLog(
-                                        "Antivirus.ts - api() - post(/api/check) - execute() - execFile(clamdscan) - fileRemove()",
+                                        "Antivirus.ts - api() - post(/api/check) - execute() - execFile()",
                                         resultFileRemove.toString()
                                     );
 
