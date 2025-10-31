@@ -27,6 +27,8 @@ export default class Antivirus {
 
             execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
                 if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
+                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stdout/stderr", `${stdout}\n${stderr}`);
+
                     helperSrc.responseBody(stdout, stderr, response, 200);
                 } else if (stdout === "" && stderr !== "") {
                     helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stderr", stderr);
@@ -56,19 +58,27 @@ export default class Antivirus {
                     const execArgumentList = [`"${input}"`];
 
                     execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
-                        helperSrc.fileRemove(input, (resultFileRemove) => {
-                            if (resultFileRemove) {
-                                if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
-                                    helperSrc.responseBody(stdout, stderr, response, 200);
-                                } else if (stdout === "" && stderr !== "") {
-                                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stderr", stderr);
-
-                                    helperSrc.responseBody("", stderr, response, 500);
-                                }
-                            } else {
-                                helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile()", resultFileRemove.toString());
+                        helperSrc.fileOrFolderRemove(input, (resultFileRemove) => {
+                            if (typeof resultFileRemove !== "boolean") {
+                                helperSrc.writeLog(
+                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderRemove(input)",
+                                    resultFileRemove.toString()
+                                );
 
                                 helperSrc.responseBody("", resultFileRemove.toString(), response, 500);
+                            }
+
+                            if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
+                                helperSrc.writeLog(
+                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stdout/stderr",
+                                    `${stdout}\n${stderr}`
+                                );
+
+                                helperSrc.responseBody(stdout, stderr, response, 200);
+                            } else if (stdout === "" && stderr !== "") {
+                                helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stderr", stderr);
+
+                                helperSrc.responseBody("", stderr, response, 500);
                             }
                         });
                     });

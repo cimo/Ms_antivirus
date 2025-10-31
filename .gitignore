@@ -21,12 +21,8 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
-.cache
-.config
-.local
 .ms_cronjob-volume
 .npm
-.pki
 certificate/*
 !certificate/.gitkeep
 certificate/proxy/*
