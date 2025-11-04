@@ -4,6 +4,10 @@ Microservice antivirus.
 
 Depend from Ms_cronjob (use the volume "ms_cronjob-volume" for share the certificate).
 
+## Info:
+
+-   ClamAV
+
 ## Installation
 
 1. For full build write on terminal:
