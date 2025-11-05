@@ -42,7 +42,7 @@ RUN cd ~ \
     # ClamAV
     && apt-get update && apt-get install -y \
     clamav-daemon \
-    && freshclam \
+    freshclam \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
