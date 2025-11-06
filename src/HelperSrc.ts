@@ -54,10 +54,10 @@ export const URL_ROOT = Ce.checkVariable("MS_A_URL_ROOT") || (process.env.MS_A_U
 export const URL_CORS_ORIGIN = Ce.checkVariable("MS_A_URL_CORS_ORIGIN") || (process.env.MS_A_URL_CORS_ORIGIN as string);
 export const PATH_CERTIFICATE_KEY = Ce.checkVariable("MS_A_PATH_CERTIFICATE_KEY");
 export const PATH_CERTIFICATE_CRT = Ce.checkVariable("MS_A_PATH_CERTIFICATE_CRT");
-export const PATH_PUBLIC = Ce.checkVariable("MS_A_PATH_PUBLIC");
+export const PATH_FILE = Ce.checkVariable("MS_A_PATH_FILE");
 export const PATH_LOG = Ce.checkVariable("MS_A_PATH_LOG");
-export const PATH_FILE_INPUT = Ce.checkVariable("MS_A_PATH_FILE_INPUT");
-export const PATH_FILE_SCRIPT = Ce.checkVariable("MS_A_PATH_FILE_SCRIPT");
+export const PATH_PUBLIC = Ce.checkVariable("MS_A_PATH_PUBLIC");
+export const PATH_SCRIPT = Ce.checkVariable("MS_A_PATH_SCRIPT");
 export const MIME_TYPE = Ce.checkVariable("MS_A_MIME_TYPE") || (process.env.MS_A_MIME_TYPE as string);
 export const FILE_SIZE_MB = Ce.checkVariable("MS_A_FILE_SIZE_MB") || (process.env.MS_A_FILE_SIZE_MB as string);
 

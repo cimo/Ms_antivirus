@@ -21,14 +21,14 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
 ENV NODE_OPTIONS=--use-openssl-ca
 
-COPY ./certificate/proxy/ /usr/local/share/ca-certificates/
+COPY ./.ms_cronjob-volume/certificate/proxy/* /usr/local/share/ca-certificates/
 COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
 COPY ./ ${PATH_ROOT}
 
 RUN cd ~ \
     # No root
-    && mkdir -p ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && useradd -U clamav -d ${PATH_ROOT} -s /bin/bash \
+    && mkdir -p ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chown -R clamav:clamav ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chmod -R 775 ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     # Update

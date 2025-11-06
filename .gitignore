@@ -21,12 +21,7 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
-.ms_cronjob-volume
 .npm
-certificate/*
-!certificate/.gitkeep
-certificate/proxy/*
-!certificate/proxy/.gitkeep
 dist
 file/input/*
 !file/input/.gitkeep

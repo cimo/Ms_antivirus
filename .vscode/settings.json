@@ -2,12 +2,12 @@
     "typescript.tsdk": "node_modules/typescript/lib",
     "l13Diff.exclude": [
         ".git",
-        ".ms_cronjob-volume",
         ".npm",
         "dist",
         "file",
         "log",
         "node_modules",
+        "package-lock.json",
         "public/file",
         "public/asset/js",
         "public/asset/library",

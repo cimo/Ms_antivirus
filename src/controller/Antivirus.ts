@@ -22,7 +22,7 @@ export default class Antivirus {
 
     api = (): void => {
         this.app.get("/api/update", this.limiter, Ca.authenticationMiddleware, (_, response: Response) => {
-            const execCommand = `. ${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE_SCRIPT}command1.sh`;
+            const execCommand = `. ${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command1.sh`;
             const execArgumentList: string[] = [];
 
             execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
@@ -52,9 +52,9 @@ export default class Antivirus {
                         }
                     }
 
-                    const input = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE_INPUT}${fileName}`;
+                    const input = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${fileName}`;
 
-                    const execCommand = `. ${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE_SCRIPT}command2.sh`;
+                    const execCommand = `. ${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command2.sh`;
                     const execArgumentList = [`"${input}"`];
 
                     execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {

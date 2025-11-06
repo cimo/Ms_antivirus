@@ -1,6 +1,6 @@
 #!/bin/bash
 
-path=${PATH_ROOT}file/input/*/
+path=${PATH_ROOT}${PATH_FILE}input/*/
 
 if [ -z "${PATH_ROOT}" ]; then
     exit 1
