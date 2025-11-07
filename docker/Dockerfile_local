@@ -58,7 +58,7 @@ WORKDIR ${PATH_ROOT}
 CMD service clamav-daemon restart \
     && service clamav-daemon status \
     # Npm
-    && rm -rf node_modules package-lock.json \
+    && rm -rf node_modules/ package-lock.json \
     && npm install \
     && npm run execute
 
