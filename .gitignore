@@ -21,6 +21,9 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
+.ms_cronjob-volume/**/*
+!.ms_cronjob-volume/**/
+!.ms_cronjob-volume/**/.gitkeep
 .npm
 dist
 file/input/*

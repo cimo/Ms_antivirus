@@ -2,8 +2,8 @@
 
 Microservice antivirus.
 
-Depend from Ms_cronjob (use "ms_cronjob-volume" for share the certificate).
-It's possible use personal certificate instead "Ms_cronjob", just put the certificate in ".ms_cronjob-volume" folder before the build.
+Depend from "Ms_cronjob" (use "ms_cronjob-volume" for share the certificate).
+It's possible to use a personal certificate instead of "Ms_cronjob", just add the certificate in the ".ms_cronjob-volume" folders.
 
 ## Info:
 
@@ -11,17 +11,16 @@ It's possible use personal certificate instead "Ms_cronjob", just put the certif
 
 ## Installation
 
-1. For full build write on terminal:
+1. For build and up write on terminal:
 
 ```
-docker compose -f docker-compose.yaml --env-file ./env/local.env build --no-cache \
-&& docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
+bash docker/container_execute.sh "local" "build-up"
 ```
 
-2. For light build (just env variable change) remove the container and write on terminal:
+2. Just for up write on terminal:
 
 ```
-docker compose -f docker-compose.yaml --env-file ./env/local.env up --detach --pull "always"
+bash docker/container_execute.sh "local" "up"
 ```
 
 ## Reset

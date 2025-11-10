@@ -4,7 +4,7 @@
         ".git",
         ".npm",
         "dist",
-        "file",
+        "file/input",
         "log",
         "node_modules",
         "package-lock.json",
