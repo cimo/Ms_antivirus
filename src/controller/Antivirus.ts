@@ -67,20 +67,20 @@ export default class Antivirus {
 
                                 helperSrc.responseBody("", resultFileRemove.toString(), response, 500);
                             }
-
-                            if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
-                                helperSrc.writeLog(
-                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stdout/stderr",
-                                    `${stdout}\n${stderr}`
-                                );
-
-                                helperSrc.responseBody(stdout, stderr, response, 200);
-                            } else if (stdout === "" && stderr !== "") {
-                                helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stderr", stderr);
-
-                                helperSrc.responseBody("", stderr, response, 500);
-                            }
                         });
+
+                        if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
+                            helperSrc.writeLog(
+                                "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stdout/stderr",
+                                `${stdout}\n${stderr}`
+                            );
+
+                            helperSrc.responseBody(stdout, stderr, response, 200);
+                        } else if (stdout === "" && stderr !== "") {
+                            helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stderr", stderr);
+
+                            helperSrc.responseBody("", stderr, response, 500);
+                        }
                     });
                 })
                 .catch((error: Error) => {
