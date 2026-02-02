@@ -37,7 +37,7 @@ RUN cd ~ \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types \
+    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
@@ -60,13 +60,15 @@ USER clamav
 
 WORKDIR ${PATH_ROOT}
 
-# Npm
-RUN rm -rf ${PATH_ROOT}node_modules/ ${PATH_ROOT}package-lock.json \
+RUN \
+    # Npm
+    rm -rf ${PATH_ROOT}node_modules/ ${PATH_ROOT}package-lock.json \
     && npm install \
     && npm run build
 
-# ClamAV
-CMD service clamav-daemon restart \
+CMD \
+    # ClamAV    
+    service clamav-daemon restart \
     && service clamav-daemon status \
     # Node
     && node ${PATH_ROOT}dist/src/controller/Server.js
