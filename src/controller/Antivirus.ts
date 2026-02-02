@@ -27,9 +27,9 @@ export default class Antivirus {
 
             execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
                 if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
-                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stdout/stderr", `${stdout}\n${stderr}`);
+                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stdout", stdout);
 
-                    helperSrc.responseBody(stdout, stderr, response, 200);
+                    helperSrc.responseBody(stdout, "", response, 200);
                 } else if (stdout === "" && stderr !== "") {
                     helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stderr", stderr);
 
@@ -70,12 +70,9 @@ export default class Antivirus {
                         });
 
                         if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
-                            helperSrc.writeLog(
-                                "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stdout/stderr",
-                                `${stdout}\n${stderr}`
-                            );
+                            helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stdout", stdout);
 
-                            helperSrc.responseBody(stdout, stderr, response, 200);
+                            helperSrc.responseBody(stdout, "", response, 200);
                         } else if (stdout === "" && stderr !== "") {
                             helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stderr", stderr);
 
