@@ -2,11 +2,12 @@
 
 Microservice antivirus.
 
-Depend from "Ms_cronjob" (use "ms_cronjob-volume" for share the certificate).
-It's possible to use a personal certificate instead of "Ms_cronjob", just add the certificate in the ".ms_cronjob-volume" folders.
+Depend on "Ms_cronjob" (use "ms_cronjob-volume" to share the certificate).
+It's possible to use a personal certificate instead of "Ms_cronjob", just add the certificate to the ".ms_cronjob-volume" folder.
 
 ## Info:
 
+-   Cross platform (Windows, Linux)
 -   ClamAV
 
 ## Installation
@@ -27,7 +28,13 @@ bash docker/container_execute.sh "local" "up"
 
 1. Remove this from the root:
 
+    - .cache
+    - .config
+    - .local
+    - .ms_cronjob-volume/certificate
     - .npm
+    - .pki
+    - dist
     - node_modules
     - package-lock.json
 

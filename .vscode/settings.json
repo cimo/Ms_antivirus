@@ -2,16 +2,21 @@
     "typescript.tsdk": "node_modules/typescript/lib",
     "l13Diff.exclude": [
         ".git",
+        ".cache",
+        ".config",
+        ".local",
+        ".ms_cronjob-volume",
         ".npm",
+        ".pki",
         "dist",
         "file/input",
         "log",
         "node_modules",
-        "package-lock.json",
         "public/file",
         "public/asset/js",
         "public/asset/library",
-        "public/asset/style"
+        "public/asset/style",
+        "package-lock.json"
     ],
     "l13Diff.ignoreEndOfLine": false,
     "l13Diff.ignoreTrimWhitespace": "default",
