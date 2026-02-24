@@ -37,17 +37,17 @@ export default class Upload {
                             if (isFileExists) {
                                 Fs.access(input, Fs.constants.F_OK, (error) => {
                                     if (!error) {
-                                        reject("File exists.");
+                                        reject(new Error("File exists."));
 
                                         return;
                                     } else {
                                         helperSrc.fileWriteStream(input, formData.buffer, (resultFileWriteStream) => {
-                                            if (resultFileWriteStream) {
+                                            if (typeof resultFileWriteStream === "boolean" && resultFileWriteStream) {
                                                 resolve(formDataList);
 
                                                 return;
                                             } else {
-                                                reject(resultFileWriteStream);
+                                                reject(new Error("File write failed."));
 
                                                 return;
                                             }
@@ -56,12 +56,12 @@ export default class Upload {
                                 });
                             } else {
                                 helperSrc.fileWriteStream(input, formData.buffer, (resultFileWriteStream) => {
-                                    if (resultFileWriteStream) {
+                                    if (typeof resultFileWriteStream === "boolean" && resultFileWriteStream) {
                                         resolve(formDataList);
 
                                         return;
                                     } else {
-                                        reject(resultFileWriteStream);
+                                        reject(new Error("File write failed."));
 
                                         return;
                                     }
@@ -72,13 +72,13 @@ export default class Upload {
                         }
                     }
                 } else {
-                    reject(resultCheckRequest);
+                    reject(new Error(resultCheckRequest));
 
                     return;
                 }
             });
 
-            request.on("error", (error) => {
+            request.on("error", (error: Error) => {
                 reject(error);
 
                 return;
