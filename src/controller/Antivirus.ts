@@ -81,7 +81,7 @@ export default class Antivirus {
                     });
                 })
                 .catch((error: Error) => {
-                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - catch()", error);
+                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - catch()", error.message);
 
                     helperSrc.responseBody("", "ko", response, 500);
                 });
