@@ -2,7 +2,7 @@
 
 p1=$(printf '%s' "${1}" | xargs)
 
-if [ -z "${p1}" ]
+if [ "$#" -lt 1 ]
 then
     echo "command2.sh - Missing parameter."
 

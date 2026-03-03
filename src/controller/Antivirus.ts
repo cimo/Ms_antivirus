@@ -61,7 +61,7 @@ export default class Antivirus {
                         helperSrc.fileOrFolderRemove(input, (resultFileRemove) => {
                             if (typeof resultFileRemove !== "boolean") {
                                 helperSrc.writeLog(
-                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderRemove(input)",
+                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderRemove()",
                                     resultFileRemove.toString()
                                 );
 
