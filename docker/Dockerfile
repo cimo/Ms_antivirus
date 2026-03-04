@@ -24,18 +24,18 @@ ENV NODE_OPTIONS=--use-openssl-ca
 ENV NODE_EXTRA_CA_CERTS="${_PATH_CERTIFICATE_PEM}"
 
 COPY ./certificate/ /usr/local/share/ca-certificates/
-COPY ./docker/NotoSansJP-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoSansSymbols2-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/NotoColorEmoji-Regular.ttf /usr/share/fonts/truetype/noto/
-COPY ./docker/font.local.conf /etc/fonts/local.conf
+COPY ./docker/font/ /usr/share/fonts/truetype/noto/
+COPY ./docker/font.conf /etc/fonts/local.conf
 COPY ./ ${PATH_ROOT}
 
 RUN cd ~ \
     # No root
     && useradd -U clamav -d ${PATH_ROOT} -s /bin/bash \
-    && mkdir -p ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chown -R clamav:clamav ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && uid="$(id -u clamav)" \
+    && mkdir -p ${PATH_ROOT} /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chown -R clamav:clamav ${PATH_ROOT} /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chmod -R 775 ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
@@ -44,7 +44,7 @@ RUN cd ~ \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
     # NodeJs
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_23.x | bash - \
     && apt-get update && apt-get install -y \
     nodejs \
     # ClamAV
