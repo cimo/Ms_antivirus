@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:26.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -30,7 +30,9 @@ COPY ./ ${PATH_ROOT}
 
 RUN cd ~ \
     # No root
-    && useradd -U clamav -d ${PATH_ROOT} -s /bin/bash \
+    && userdel -r ubuntu \
+    && groupadd -g 1000 clamav \
+    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash clamav \
     && uid="$(id -u clamav)" \
     && mkdir -p ${PATH_ROOT} /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chown -R clamav:clamav ${PATH_ROOT} /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
