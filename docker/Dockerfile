@@ -1,4 +1,4 @@
-FROM ubuntu:26.04
+FROM ubuntu:24.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -66,15 +66,12 @@ WORKDIR ${PATH_ROOT}
 
 RUN \
     # Npm
-    rm -rf ${PATH_ROOT}node_modules/ ${PATH_ROOT}package-lock.json \
-    && npm install \
-    && npm run build
+    bash ${PATH_ROOT}script/npm.sh "build"
 
 CMD \
     # ClamAV    
-    service clamav-daemon restart \
-    && service clamav-daemon status \
-    # Node
-    && node ${PATH_ROOT}dist/src/controller/Server.js
+    bash ${PATH_ROOT}script/clamav.sh \
+    # NodeJs
+    && bash ${PATH_ROOT}script/nodejs.sh
 
 EXPOSE ${SERVER_PORT}

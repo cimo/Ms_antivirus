@@ -1,4 +1,4 @@
-FROM ubuntu:26.04
+FROM ubuntu:24.04
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -63,11 +63,8 @@ WORKDIR ${PATH_ROOT}
 
 CMD \
     # ClamAV
-    service clamav-daemon restart \
-    && service clamav-daemon status \
+    bash ${PATH_ROOT}script/clamav.sh \
     # Npm
-    && rm -rf ${PATH_ROOT}node_modules/ ${PATH_ROOT}package-lock.json \
-    && npm install \
-    && npm run execute
+    && bash ${PATH_ROOT}script/npm.sh "execute"
 
 EXPOSE ${SERVER_PORT}
