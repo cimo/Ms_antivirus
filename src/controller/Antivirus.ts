@@ -58,14 +58,14 @@ export default class Antivirus {
                     const execArgumentList = [`"${input}"`];
 
                     execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
-                        helperSrc.fileOrFolderRemove(input, (resultFileRemove) => {
-                            if (typeof resultFileRemove !== "boolean") {
+                        helperSrc.fileOrFolderDelete(input, (resultFileDelete) => {
+                            if (typeof resultFileDelete !== "boolean") {
                                 helperSrc.writeLog(
-                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderRemove()",
-                                    resultFileRemove.toString()
+                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderDelete()",
+                                    resultFileDelete.toString()
                                 );
 
-                                helperSrc.responseBody("", resultFileRemove.toString(), response, 500);
+                                helperSrc.responseBody("", resultFileDelete.toString(), response, 500);
                             }
                         });
 
