@@ -21,8 +21,10 @@ ENV VERSION_TAG=${_VERSION_TAG}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 ENV SUDO_FORCE_REMOVE=yes
+ENV HISTFILE="/home/clamav/.bash_history"
 ENV NODE_OPTIONS=--use-openssl-ca
 ENV NODE_EXTRA_CA_CERTS="${PATH_CERTIFICATE_PEM}"
+ENV NPM_CONFIG_USERCONFIG="/home/clamav/.npmrc"
 
 COPY ./certificate/ /usr/local/share/ca-certificates/
 COPY ./docker/font/ /usr/share/fonts/truetype/noto/
@@ -35,9 +37,9 @@ RUN cd ~ \
     && groupadd -g 1000 clamav \
     && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash clamav \
     && uid="$(id -u clamav)" \
-    && mkdir -p ${PATH_ROOT} /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chown -R clamav:clamav ${PATH_ROOT} /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chmod -R 775 ${PATH_ROOT} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && mkdir -p ${PATH_ROOT} /home/clamav/ /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chown -R clamav:clamav ${PATH_ROOT} /home/clamav/ /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chmod -R 775 ${PATH_ROOT} /home/clamav/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chmod -R 700 /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
