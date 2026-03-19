@@ -37,10 +37,9 @@ RUN cd ~ \
     && groupadd -g 1000 clamav \
     && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash clamav \
     && uid="$(id -u clamav)" \
-    && mkdir -p ${PATH_ROOT} /home/clamav/ /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chown -R clamav:clamav ${PATH_ROOT} /home/clamav/ /run/user/${uid} /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chmod -R 775 ${PATH_ROOT} /home/clamav/ /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    && chmod -R 700 /run/user/${uid} \
+    && mkdir -p ${PATH_ROOT} /home/clamav/ /run/user/${uid} \
+    && chown -R clamav:clamav ${PATH_ROOT} /home/clamav/ /run/user/${uid} \
+    && chmod -R 775 ${PATH_ROOT} /home/clamav/ /run/user/${uid} \
     # Update
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
@@ -56,6 +55,9 @@ RUN cd ~ \
     && apt-get update && apt-get install -y \
     clamav-daemon \
     && freshclam \
+    && mkdir -p /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chown -R clamav:clamav /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    && chmod -R 775 /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -rf /var/lib/apt/lists/* \
