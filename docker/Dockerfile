@@ -47,7 +47,7 @@ RUN cd ~ \
     && echo 'Acquire::https::No-Cache "true";' >> /etc/apt/apt.conf.d/99no-cache \
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
     && chmod -R 0644 /usr/local/share/ca-certificates/ \
-    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq \
+    && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq gettext-base lynx \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
     && echo "application/typescript ts" >> /etc/mime.types \
@@ -77,10 +77,6 @@ RUN \
     # Npm
     bash ${PATH_ROOT}script/npm.sh "build"
 
-CMD \
-    # ClamAV    
-    bash ${PATH_ROOT}script/clamav.sh \
-    # NodeJs
-    && bash ${PATH_ROOT}script/nodejs.sh
+CMD ["sh", "-c", "bash ${PATH_ROOT}script/clamav.sh && bash ${PATH_ROOT}script/nodejs.sh"]
 
 EXPOSE ${SERVER_PORT}
