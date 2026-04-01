@@ -22,10 +22,18 @@ export default class Antivirus {
 
     api = (): void => {
         this.app.get("/api/update", this.limiter, Ca.authenticationMiddleware, (_, response: Response) => {
-            const execCommand = `. ${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command1.sh`;
-            const execArgumentList: string[] = [];
+            const execCommand = `${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command1.sh`;
+            const execArgumentList = [execCommand];
 
-            execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
+            execFile("/bin/bash", execArgumentList, { encoding: "utf8" }, (error, stdout, stderr) => {
+                if (error) {
+                    helperSrc.writeLog(`Antivirus.ts - api() - get(/api/update) - execFile() - error`, error.message);
+
+                    helperSrc.responseBody("", error.message, response, 500);
+
+                    return;
+                }
+
                 if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
                     helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stdout", stdout);
 
@@ -54,10 +62,10 @@ export default class Antivirus {
 
                     const input = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${fileName}`;
 
-                    const execCommand = `. ${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command2.sh`;
-                    const execArgumentList = [`"${input}"`];
+                    const execCommand = `${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command2.sh`;
+                    const execArgumentList = [execCommand, input];
 
-                    execFile(execCommand, execArgumentList, { shell: "/bin/bash", encoding: "utf8" }, (_, stdout, stderr) => {
+                    execFile("/bin/bash", execArgumentList, { encoding: "utf8" }, (error, stdout, stderr) => {
                         helperSrc.fileOrFolderDelete(input, (resultFileDelete) => {
                             if (typeof resultFileDelete !== "boolean") {
                                 helperSrc.writeLog(
@@ -68,6 +76,14 @@ export default class Antivirus {
                                 helperSrc.responseBody("", resultFileDelete.toString(), response, 500);
                             }
                         });
+
+                        if (error) {
+                            helperSrc.writeLog(`Antivirus.ts - api() - post(/api/check) - execFile() - error`, error.message);
+
+                            helperSrc.responseBody("", error.message, response, 500);
+
+                            return;
+                        }
 
                         if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
                             helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - execFile() - stdout", stdout);
