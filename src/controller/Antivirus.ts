@@ -35,11 +35,11 @@ export default class Antivirus {
                 }
 
                 if ((stdout !== "" && stderr === "") || (stdout !== "" && stderr !== "")) {
-                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stdout", stdout);
+                    helperSrc.writeLog("Antivirus.ts - api() - get(/api/update) - execFile() - stdout", stdout);
 
                     helperSrc.responseBody(stdout, "", response, 200);
                 } else if (stdout === "" && stderr !== "") {
-                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/update) - execFile() - stderr", stderr);
+                    helperSrc.writeLog("Antivirus.ts - api() - get(/api/update) - execFile() - stderr", stderr);
 
                     helperSrc.responseBody("", stderr, response, 500);
                 }
@@ -66,17 +66,6 @@ export default class Antivirus {
                     const execArgumentList = [execCommand, input];
 
                     execFile("/bin/bash", execArgumentList, { encoding: "utf8" }, (error, stdout, stderr) => {
-                        helperSrc.fileOrFolderDelete(input, (resultFileDelete) => {
-                            if (typeof resultFileDelete !== "boolean") {
-                                helperSrc.writeLog(
-                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderDelete()",
-                                    resultFileDelete.toString()
-                                );
-
-                                helperSrc.responseBody("", resultFileDelete.toString(), response, 500);
-                            }
-                        });
-
                         if (error) {
                             helperSrc.writeLog(`Antivirus.ts - api() - post(/api/check) - execFile() - error`, error.message);
 
@@ -94,6 +83,15 @@ export default class Antivirus {
 
                             helperSrc.responseBody("", stderr, response, 500);
                         }
+
+                        helperSrc.fileOrFolderDelete(input, (resultFileDelete) => {
+                            if (typeof resultFileDelete !== "boolean") {
+                                helperSrc.writeLog(
+                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderDelete()",
+                                    resultFileDelete.toString()
+                                );
+                            }
+                        });
                     });
                 })
                 .catch((error: Error) => {
