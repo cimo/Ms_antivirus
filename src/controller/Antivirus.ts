@@ -48,7 +48,7 @@ export default class Antivirus {
 
         this.app.post("/api/check", this.limiter, Ca.authenticationMiddleware, (request: Request, response: Response) => {
             this.controllerUpload
-                .execute(request, true)
+                .execute(request, true, false, `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/`)
                 .then((resultControllerUploadList) => {
                     let fileName = "";
 
