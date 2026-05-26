@@ -60,7 +60,9 @@ export default class Antivirus {
                         }
                     }
 
-                    const input = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${fileName}`;
+                    const baseFileName = helperSrc.baseFileName(fileName);
+                    const input = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${baseFileName}/${fileName}`;
+                    const inputFolder = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${baseFileName}/`;
 
                     const execCommand = `${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command2.sh`;
                     const execArgumentList = [execCommand, input];
@@ -84,10 +86,10 @@ export default class Antivirus {
                             helperSrc.responseBody("", stderr, response, 500);
                         }
 
-                        helperSrc.fileOrFolderDelete(input, (resultFileDelete) => {
+                        helperSrc.fileOrFolderDelete(inputFolder, (resultFileDelete) => {
                             if (typeof resultFileDelete !== "boolean") {
                                 helperSrc.writeLog(
-                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderDelete()",
+                                    "Antivirus.ts - api() - post(/api/check) - execute() - execFile() - fileOrFolderDelete(inputFolder)",
                                     resultFileDelete.toString()
                                 );
                             }
