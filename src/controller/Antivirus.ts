@@ -28,7 +28,7 @@ export default class Antivirus {
                 if (result.error) {
                     helperSrc.writeLog(`Antivirus.ts - api() - get(/api/update) - executionFile() - error`, result.error.message);
 
-                    helperSrc.responseBody("", result.error.message, response, 500);
+                    helperSrc.responseBody("", "ko", response, 500);
 
                     return;
                 }
@@ -40,7 +40,7 @@ export default class Antivirus {
                 } else if (result.stdout === "" && result.stderr !== "") {
                     helperSrc.writeLog("Antivirus.ts - api() - get(/api/update) - executionFile() - stderr", result.stderr);
 
-                    helperSrc.responseBody("", result.stderr, response, 500);
+                    helperSrc.responseBody("", "ko", response, 500);
                 }
             });
         });
@@ -73,7 +73,7 @@ export default class Antivirus {
                         if (result.error) {
                             helperSrc.writeLog(`Antivirus.ts - api() - post(/api/check) - executionFile() - error`, result.error.message);
 
-                            helperSrc.responseBody("", result.error.message, response, 500);
+                            helperSrc.responseBody("", "ko", response, 500);
                         } else if ((result.stdout !== "" && result.stderr === "") || (result.stdout !== "" && result.stderr !== "")) {
                             helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - executionFile() - stdout", result.stdout);
 
@@ -81,7 +81,7 @@ export default class Antivirus {
                         } else if (result.stdout === "" && result.stderr !== "") {
                             helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - executionFile() - stderr", result.stderr);
 
-                            helperSrc.responseBody("", result.stderr, response, 500);
+                            helperSrc.responseBody("", "ko", response, 500);
                         }
 
                         const fileOrFolderDelete = await helperSrc.fileOrFolderDelete(inputFolder);
