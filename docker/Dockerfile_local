@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:25.10
 
 ARG _ENV_NAME
 ARG _DOMAIN
@@ -52,6 +52,7 @@ RUN cd ~ \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get update && apt-get install -y \
     nodejs \
+    && npm install -g npm@12.0.1 \
     # ClamAV
     && apt-get update && apt-get install -y \
     clamav-daemon \
@@ -59,12 +60,15 @@ RUN cd ~ \
     && mkdir -p /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chown -R clamav:clamav /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chmod -R 775 /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    # Upgrade
+    && apt-get update \
+    && apt-get upgrade -y \
     # Clean
     && apt-get remove --purge -y sudo \
-    && rm -rf /var/lib/apt/lists/* \
     && apt-get clean -y \
     && apt-get autoclean -y \
-    && apt-get autoremove -y
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
 
 USER clamav
 
