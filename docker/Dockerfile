@@ -37,9 +37,9 @@ RUN cd ~ \
     && groupadd -g 1000 clamav \
     && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash clamav \
     && uid="$(id -u clamav)" \
-    && mkdir -p ${PATH_ROOT} /home/clamav/ /run/user/${uid} \
-    && chown -R clamav:clamav ${PATH_ROOT} /home/clamav/ /run/user/${uid} \
-    && chmod -R 775 ${PATH_ROOT} /home/clamav/ \
+    && mkdir -p ${PATH_ROOT} /home/clamav/ /run/user/${uid} /usr/lib/node_modules/npm/ \
+    && chown -R clamav:clamav ${PATH_ROOT} /home/clamav/ /run/user/${uid} /usr/lib/node_modules/npm/ \
+    && chmod -R 775 ${PATH_ROOT} /home/clamav/ /usr/lib/node_modules/npm/ \
     && chmod -R 700 /run/user/${uid} \
     # Update
     && echo 'Acquire::Retries "3";' > /etc/apt/apt.conf.d/80-retries \
@@ -55,7 +55,13 @@ RUN cd ~ \
     && curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && apt-get update && apt-get install -y \
     nodejs \
-    && npm install -g npm@12.0.1 \
+    && npm install -g npm@latest \
+    && rm -rf /usr/lib/node_modules/npm/node_modules/brace-expansion \
+    && mkdir -p /usr/lib/node_modules/npm/node_modules/brace-expansion \
+    && curl -fsSL https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.8.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/brace-expansion \
+    && rm -rf /usr/lib/node_modules/npm/node_modules/tar \
+    && mkdir -p /usr/lib/node_modules/npm/node_modules/tar \
+    && curl -fsSL https://registry.npmjs.org/tar/-/tar-7.5.21.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/tar \
     # ClamAV
     && apt-get update && apt-get install -y \
     clamav-daemon \
@@ -63,11 +69,9 @@ RUN cd ~ \
     && mkdir -p /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chown -R clamav:clamav /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chmod -R 775 /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
-    # Upgrade
-    && apt-get update \
-    && apt-get upgrade -y \
     # Clean
     && apt-get remove --purge -y sudo \
+    && rm -f cuda-keyring_1.1-1_all.deb \
     && apt-get clean -y \
     && apt-get autoclean -y \
     && apt-get autoremove -y \
