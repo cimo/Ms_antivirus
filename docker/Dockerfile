@@ -58,7 +58,7 @@ RUN cd ~ \
     && npm install -g npm@latest \
     && rm -rf /usr/lib/node_modules/npm/node_modules/brace-expansion \
     && mkdir -p /usr/lib/node_modules/npm/node_modules/brace-expansion \
-    && curl -fsSL https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.8.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/brace-expansion \
+    && curl -fsSL https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.9.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/brace-expansion \
     && rm -rf /usr/lib/node_modules/npm/node_modules/tar \
     && mkdir -p /usr/lib/node_modules/npm/node_modules/tar \
     && curl -fsSL https://registry.npmjs.org/tar/-/tar-7.5.21.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/tar \
@@ -69,6 +69,9 @@ RUN cd ~ \
     && mkdir -p /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chown -R clamav:clamav /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
     && chmod -R 775 /run/clamav/ /var/run/clamav/ /var/lib/clamav/ /etc/clamav/ \
+    # Upgrade
+    && apt-get update \
+    && apt-get upgrade -y \
     # Clean
     && apt-get remove --purge -y sudo \
     && rm -f cuda-keyring_1.1-1_all.deb \
