@@ -30,9 +30,10 @@ COPY ./docker/font.conf /etc/fonts/local.conf
 
 RUN cd ~ \
     # No root
-    && userdel -r ubuntu \
+    && userdel ubuntu \
+    && rm -rf /home/ubuntu/ \
     && groupadd -g 1000 clamav \
-    && useradd -m -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash clamav \
+    && useradd -M -u 1000 -g 1000 -d ${PATH_ROOT} -s /bin/bash clamav \
     && uid="$(id -u clamav)" \
     && mkdir -p ${PATH_ROOT} /home/clamav/ /run/user/${uid} /usr/lib/node_modules/npm/ \
     && chown -R clamav:clamav ${PATH_ROOT} /home/clamav/ /run/user/${uid} /usr/lib/node_modules/npm/ \
@@ -43,7 +44,8 @@ RUN cd ~ \
     && echo 'Acquire::http::No-Cache "true";' > /etc/apt/apt.conf.d/99no-cache \
     && echo 'Acquire::https::No-Cache "true";' >> /etc/apt/apt.conf.d/99no-cache \
     && VERSION_CODENAME=$(grep VERSION_CODENAME= /etc/os-release | cut -d= -f2) \
-    && chmod -R 0644 /usr/local/share/ca-certificates/ \
+    && find /usr/local/share/ca-certificates/ -type d -exec chmod 755 {} + \
+    && find /usr/local/share/ca-certificates/ -type f -exec chmod 644 {} + \
     && apt-get update && apt-get install -y ca-certificates tzdata curl media-types jq gettext-base \
     && update-ca-certificates \
     && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone \
@@ -53,12 +55,26 @@ RUN cd ~ \
     && apt-get update && apt-get install -y \
     nodejs \
     && npm install -g npm@12.0.2 \
-    && rm -rf /usr/lib/node_modules/npm/node_modules/brace-expansion \
-    && mkdir -p /usr/lib/node_modules/npm/node_modules/brace-expansion \
-    && curl -fsSL https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.9.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/brace-expansion \
-    && rm -rf /usr/lib/node_modules/npm/node_modules/tar \
-    && mkdir -p /usr/lib/node_modules/npm/node_modules/tar \
-    && curl -fsSL https://registry.npmjs.org/tar/-/tar-7.5.21.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/tar \
+    && if [ -d /usr/lib/node_modules/npm/node_modules/brace-expansion/ ]; then \
+    rm -rf /usr/lib/node_modules/npm/node_modules/brace-expansion/; \
+    mkdir -p /usr/lib/node_modules/npm/node_modules/brace-expansion/; \
+    curl -fsSL https://registry.npmjs.org/brace-expansion/-/brace-expansion-5.0.9.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/brace-expansion/; \
+    fi \
+    && if [ -d /usr/lib/node_modules/npm/node_modules/tar/ ]; then \
+    rm -rf /usr/lib/node_modules/npm/node_modules/tar/; \
+    mkdir -p /usr/lib/node_modules/npm/node_modules/tar/; \
+    curl -fsSL https://registry.npmjs.org/tar/-/tar-7.5.21.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/tar/; \
+    fi \
+    && if [ -d /usr/lib/node_modules/npm/node_modules/ip-address/ ]; then \
+    rm -rf /usr/lib/node_modules/npm/node_modules/ip-address/; \
+    mkdir -p /usr/lib/node_modules/npm/node_modules/ip-address/; \
+    curl -fsSL https://registry.npmjs.org/ip-address/-/ip-address-10.3.1.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/ip-address/; \
+    fi \
+    && if [ -d /usr/lib/node_modules/npm/node_modules/undici/ ]; then \
+    rm -rf /usr/lib/node_modules/npm/node_modules/undici/; \
+    mkdir -p /usr/lib/node_modules/npm/node_modules/undici/; \
+    curl -fsSL https://registry.npmjs.org/undici/-/undici-6.28.0.tgz | tar -xz --strip-components=1 -C /usr/lib/node_modules/npm/node_modules/undici/; \
+    fi \
     # ClamAV
     && apt-get update && apt-get install -y \
     clamav-daemon \
@@ -71,7 +87,6 @@ RUN cd ~ \
     && apt-get upgrade -y \
     # Clean
     && apt-get remove --purge -y sudo \
-    && rm -f cuda-keyring_1.1-1_all.deb \
     && apt-get clean -y \
     && apt-get autoclean -y \
     && apt-get autoremove -y \
