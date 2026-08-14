@@ -6,7 +6,7 @@ import { Ca } from "@cimo/authentication/dist/src/Main.js";
 import * as helperSrc from "../HelperSrc.js";
 import ControllerUpload from "./Upload.js";
 
-export default class Antivirus {
+export default class Service {
     // Variable
     private app: Express.Express;
     private limiter: RateLimitRequestHandler;
@@ -26,21 +26,21 @@ export default class Antivirus {
 
             helperSrc.executionFile(executionArgumentList).then((result) => {
                 if (result.error) {
-                    helperSrc.writeLog(`Antivirus.ts - api() - get(/api/update) - executionFile() - error`, result.error.message);
+                    helperSrc.writeLog(`Service.ts - api() - get(/api/update) - executionFile() - error`, result.error.message);
 
                     helperSrc.responseBody("", "ko", response, 500);
 
                     return;
                 }
 
-                if ((result.stdout !== "" && result.stderr === "") || (result.stdout !== "" && result.stderr !== "")) {
-                    helperSrc.writeLog("Antivirus.ts - api() - get(/api/update) - executionFile() - stdout", result.stdout);
-
-                    helperSrc.responseBody(result.stdout, "", response, 200);
-                } else if (result.stdout === "" && result.stderr !== "") {
-                    helperSrc.writeLog("Antivirus.ts - api() - get(/api/update) - executionFile() - stderr", result.stderr);
+                if (result.stdout === "" && result.stderr !== "") {
+                    helperSrc.writeLog("Service.ts - api() - get(/api/update) - executionFile() - stderr", result.stderr);
 
                     helperSrc.responseBody("", "ko", response, 500);
+                } else if ((result.stdout !== "" && result.stderr === "") || (result.stdout !== "" && result.stderr !== "")) {
+                    helperSrc.writeLog("Service.ts - api() - get(/api/update) - executionFile() - stdout", result.stdout);
+
+                    helperSrc.responseBody(result.stdout, "", response, 200);
                 }
             });
         });
@@ -71,31 +71,31 @@ export default class Antivirus {
 
                     helperSrc.executionFile(executionArgumentList).then(async (result) => {
                         if (result.error) {
-                            helperSrc.writeLog(`Antivirus.ts - api() - post(/api/check) - executionFile() - error`, result.error.message);
+                            helperSrc.writeLog(`Service.ts - api() - post(/api/check) - executionFile() - error`, result.error.message);
+
+                            helperSrc.responseBody("", "ko", response, 500);
+                        } else if (result.stdout === "" && result.stderr !== "") {
+                            helperSrc.writeLog("Service.ts - api() - post(/api/check) - execute() - executionFile() - stderr", result.stderr);
 
                             helperSrc.responseBody("", "ko", response, 500);
                         } else if ((result.stdout !== "" && result.stderr === "") || (result.stdout !== "" && result.stderr !== "")) {
-                            helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - executionFile() - stdout", result.stdout);
+                            helperSrc.writeLog("Service.ts - api() - post(/api/check) - execute() - executionFile() - stdout", result.stdout);
 
                             helperSrc.responseBody(result.stdout, "", response, 200);
-                        } else if (result.stdout === "" && result.stderr !== "") {
-                            helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - executionFile() - stderr", result.stderr);
-
-                            helperSrc.responseBody("", "ko", response, 500);
                         }
 
                         const fileOrFolderDelete = await helperSrc.fileOrFolderDelete(pathInputBasename);
 
                         if (typeof fileOrFolderDelete !== "boolean") {
                             helperSrc.writeLog(
-                                "Antivirus.ts - api() - post(/api/check) - execute() - executionFile() - fileOrFolderDelete(pathInputBasename)",
+                                "Service.ts - api() - post(/api/check) - execute() - executionFile() - fileOrFolderDelete(pathInputBasename)",
                                 fileOrFolderDelete.toString()
                             );
                         }
                     });
                 })
                 .catch((error: Error) => {
-                    helperSrc.writeLog("Antivirus.ts - api() - post(/api/check) - execute() - catch()", error.message);
+                    helperSrc.writeLog("Service.ts - api() - post(/api/check) - execute() - catch()", error.message);
 
                     helperSrc.responseBody("", "ko", response, 500);
                 });
