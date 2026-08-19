@@ -48,7 +48,7 @@ export default class Service {
         this.app.post("/api/check", this.limiter, Ca.authenticationMiddleware, (request: Request, response: Response) => {
             this.controllerUpload
                 .execute(request, true, false, `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/`)
-                .then((resultControllerUploadList) => {
+                .then(async (resultControllerUploadList) => {
                     let fileName = "";
 
                     for (let a = 0; a < resultControllerUploadList.length; a++) {
@@ -61,7 +61,7 @@ export default class Service {
                         }
                     }
 
-                    const fileDetail = helperSrc.fileDetail(fileName);
+                    const fileDetail = await helperSrc.fileDetail(fileName);
 
                     const pathInput = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${fileDetail.baseName}/${fileName}`;
                     const pathInputBasename = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${fileDetail.baseName}/`;
