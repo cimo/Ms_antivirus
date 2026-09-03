@@ -567,6 +567,20 @@ export const fileOrFolderRename = (
     });
 };
 
+export const fileOrFolderExists = (path: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+        Fs.access(path, Fs.constants.F_OK, (error) => {
+            if (error) {
+                resolve(false);
+
+                return;
+            }
+
+            resolve(true);
+        });
+    });
+};
+
 export const keepProcess = (): void => {
     const eventList = ["uncaughtException", "unhandledRejection"];
 
@@ -586,16 +600,14 @@ export const ansiEscapeDelete = (text: string): string => {
 };
 
 export const findPathFileRecursive = (path: string, extension: string): Promise<string[]> => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
         const resultList: string[] = [];
 
-        Fs.access(path, Fs.constants.F_OK, (errorAccess) => {
-            if (errorAccess) {
-                resolve(resultList);
+        const isExists = await fileOrFolderExists(path);
 
-                return;
-            }
-
+        if (!isExists) {
+            resolve(resultList);
+        } else {
             Fs.readdir(path, (errorReadDir, dataList) => {
                 if (errorReadDir) {
                     resolve(resultList);
@@ -638,7 +650,7 @@ export const findPathFileRecursive = (path: string, extension: string): Promise<
 
                 next();
             });
-        });
+        }
     });
 };
 
@@ -663,16 +675,14 @@ export const findPathDirnameRecursive = async (path: string, fileName: string): 
 };
 
 export const readFirstLevelRecursive = (path: string, extension: string, pathPrevious?: string): Promise<string[]> => {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
         const resultList: string[] = [];
 
-        Fs.access(path, Fs.constants.F_OK, (errorAccess) => {
-            if (errorAccess) {
-                resolve(resultList);
+        const isExists = await fileOrFolderExists(path);
 
-                return;
-            }
-
+        if (!isExists) {
+            resolve(resultList);
+        } else {
             Fs.readdir(path, (errorReadDir, dataList) => {
                 if (errorReadDir) {
                     resolve(resultList);
@@ -721,7 +731,7 @@ export const readFirstLevelRecursive = (path: string, extension: string, pathPre
 
                 next();
             });
-        });
+        }
     });
 };
 
