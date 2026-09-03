@@ -28,7 +28,7 @@ export default class Service {
                 if (result.error) {
                     helperSrc.writeLog(`Service.ts - api() - get(/api/update) - executionFile() - error`, result.error.message);
 
-                    helperSrc.responseBody("", "ko", response, 500);
+                    helperSrc.responseBody({ state: "ko", message: result.error.message }, response, 500);
 
                     return;
                 }
@@ -36,11 +36,11 @@ export default class Service {
                 if (result.stdout === "" && result.stderr !== "") {
                     helperSrc.writeLog("Service.ts - api() - get(/api/update) - executionFile() - stderr", result.stderr);
 
-                    helperSrc.responseBody("", "ko", response, 500);
+                    helperSrc.responseBody({ state: "ko", message: result.stderr }, response, 500);
                 } else if ((result.stdout !== "" && result.stderr === "") || (result.stdout !== "" && result.stderr !== "")) {
                     helperSrc.writeLog("Service.ts - api() - get(/api/update) - executionFile() - stdout", result.stdout);
 
-                    helperSrc.responseBody(result.stdout, "", response, 200);
+                    helperSrc.responseBody({ state: "ok", message: "", data: result.stdout }, response, 200);
                 }
             });
         });
@@ -73,15 +73,15 @@ export default class Service {
                         if (result.error) {
                             helperSrc.writeLog(`Service.ts - api() - post(/api/check) - executionFile() - error`, result.error.message);
 
-                            helperSrc.responseBody("", "ko", response, 500);
+                            helperSrc.responseBody({ state: "ko", message: result.error.message }, response, 500);
                         } else if (result.stdout === "" && result.stderr !== "") {
                             helperSrc.writeLog("Service.ts - api() - post(/api/check) - execute() - executionFile() - stderr", result.stderr);
 
-                            helperSrc.responseBody("", "ko", response, 500);
+                            helperSrc.responseBody({ state: "ko", message: result.stderr }, response, 500);
                         } else if ((result.stdout !== "" && result.stderr === "") || (result.stdout !== "" && result.stderr !== "")) {
                             helperSrc.writeLog("Service.ts - api() - post(/api/check) - execute() - executionFile() - stdout", result.stdout);
 
-                            helperSrc.responseBody(result.stdout, "", response, 200);
+                            helperSrc.responseBody({ state: "ok", message: "", data: result.stdout }, response, 200);
                         }
 
                         const fileOrFolderDelete = await helperSrc.fileOrFolderDelete(pathInputBasename);
@@ -97,7 +97,7 @@ export default class Service {
                 .catch((error: Error) => {
                     helperSrc.writeLog("Service.ts - api() - post(/api/check) - execute() - catch()", error.message);
 
-                    helperSrc.responseBody("", "ko", response, 500);
+                    helperSrc.responseBody({ state: "ko", message: error.message }, response, 500);
                 });
         });
     };
