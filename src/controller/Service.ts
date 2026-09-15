@@ -46,8 +46,10 @@ export default class Service {
         });
 
         this.app.post("/api/check", this.limiter, Ca.authenticationMiddleware, (request: Request, response: Response) => {
+            const uniqueId = helperSrc.generateUniqueId();
+
             this.controllerUpload
-                .execute(request, true, false, `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/`)
+                .execute(request, true, false, `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${uniqueId}/`)
                 .then(async (resultControllerUploadList) => {
                     let fileName = "";
 
@@ -63,8 +65,8 @@ export default class Service {
 
                     const fileDetail = await helperSrc.fileDetail(fileName);
 
-                    const pathInput = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${fileDetail.baseName}/${fileName}`;
-                    const pathInputBasename = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${fileDetail.baseName}/`;
+                    const pathInput = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${uniqueId}/${fileDetail.baseName}/${fileName}`;
+                    const pathInputBasename = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${uniqueId}/`;
 
                     const pathExecutionCommand = `${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command2.sh`;
                     const executionArgumentList = [pathExecutionCommand, pathInput];
