@@ -1,6 +1,6 @@
 #!/bin/bash
 
-p1=$(printf '%s' "${1}" | xargs)
+p1="${1}"
 
 if [ "$#" -lt 1 ] || [ -z "${p1}" ]
 then

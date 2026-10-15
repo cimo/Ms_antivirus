@@ -50,14 +50,20 @@ export default class Service {
 
             this.controllerUpload
                 .execute(request, true, false, `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${uniqueId}/`)
-                .then(async (resultControllerUploadList) => {
+                .then(async (resultControllerUpload) => {
+                    if (resultControllerUpload.message !== "") {
+                        helperSrc.responseBody({ state: "ko", message: resultControllerUpload.message }, response, 200);
+
+                        return;
+                    }
+
                     let fileName = "";
 
-                    for (let a = 0; a < resultControllerUploadList.length; a++) {
-                        const resultControllerUpload = resultControllerUploadList[a];
+                    for (let a = 0; a < resultControllerUpload.formDataList.length; a++) {
+                        const formData = resultControllerUpload.formDataList[a];
 
-                        if (resultControllerUpload.name === "file" && resultControllerUpload.fileName) {
-                            fileName = resultControllerUpload.fileName;
+                        if (formData.name === "file" && formData.fileName) {
+                            fileName = formData.fileName;
 
                             break;
                         }
@@ -65,7 +71,7 @@ export default class Service {
 
                     const fileDetail = await helperSrc.fileDetail(fileName);
 
-                    const pathInput = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${uniqueId}/${fileDetail.baseName}/${fileName}`;
+                    const pathInput = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${uniqueId}/${fileDetail.baseName}/${fileDetail.name}`;
                     const pathInputBasename = `${helperSrc.PATH_ROOT}${helperSrc.PATH_FILE}input/${uniqueId}/`;
 
                     const pathExecutionCommand = `${helperSrc.PATH_ROOT}${helperSrc.PATH_SCRIPT}command2.sh`;
