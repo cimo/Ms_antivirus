@@ -39,7 +39,7 @@ export const MIME_TYPE = Ce.checkVariable("MS_A_MIME_TYPE") || (process.env["MS_
 export const FILE_SIZE_MB = Ce.checkVariable("MS_A_FILE_SIZE_MB") || (process.env["MS_A_FILE_SIZE_MB"] as string);
 
 // Custom
-export const PERSISTENCE_SECOND = Ce.checkVariable("MS_A_PERSISTENCE_SECOND") || (process.env["MS_A_PERSISTENCE_SECOND"] as string);
+export const PERSISTENCE_SECOND = parseInt(Ce.checkVariable("MS_A_PERSISTENCE_SECOND") || (process.env["MS_A_PERSISTENCE_SECOND"] as string));
 // Custom
 
 const fileSize = (value: Uint8Array | number, isOnlyByte = true): string => {
